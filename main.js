@@ -1,6 +1,7 @@
 let frequencyData = {};
 let currentMapping = {};
 let systemGuess = {};
+let previousDecoded = '';
 
 function analyze() {
   const input = document.getElementById("cipherText").value;
@@ -223,8 +224,64 @@ function decodeText() {
     }
   }
 
+  // 変更箇所を特定してハイライト表示
+  displayDecodedTextWithHighlight(decoded);
+  
+  // 前回の結果を保存
+  previousDecoded = decoded;
+}
+
+function displayDecodedTextWithHighlight(newDecoded) {
   const decodedElement = document.getElementById("decodedText");
-  decodedElement.textContent = decoded;
+  
+  // 文字単位でspan要素に分割
+  let htmlContent = '';
+  const changedPositions = [];
+  
+  for (let i = 0; i < newDecoded.length; i++) {
+    const currentChar = newDecoded[i];
+    const previousChar = previousDecoded[i] || '';
+    const isChanged = currentChar !== previousChar && previousDecoded !== '';
+    
+    if (isChanged) {
+      changedPositions.push(i);
+    }
+    
+    if (currentChar.match(/[a-zA-Z*?]/)) {
+      htmlContent += `<span class="char-${i}${isChanged ? ' changed-char just-changed' : ''}">${currentChar}</span>`;
+    } else {
+      htmlContent += currentChar;
+    }
+  }
+  
+  decodedElement.innerHTML = htmlContent;
+  
+  // 変更された文字のアニメーション処理
+  if (changedPositions.length > 0) {
+    setTimeout(() => {
+      changedPositions.forEach(pos => {
+        const element = decodedElement.querySelector(`.char-${pos}`);
+        if (element) {
+          element.classList.remove('just-changed');
+        }
+      });
+    }, 500);
+    
+    // 5秒後にフェードアウト開始
+    setTimeout(() => {
+      changedPositions.forEach(pos => {
+        const element = decodedElement.querySelector(`.char-${pos}`);
+        if (element) {
+          element.classList.add('fade-out');
+          
+          // フェードアウト完了後にクラスを削除
+          setTimeout(() => {
+            element.classList.remove('changed-char', 'fade-out');
+          }, 1000);
+        }
+      });
+    }, 5000);
+  }
 }
 
 function drawFrequencyChart() {
@@ -303,6 +360,7 @@ function drawFrequencyChart() {
 
 function clearMapping() {
   currentMapping = {};
+  previousDecoded = '';
   // システム推測を再適用
   generateSystemGuess();
   createMappingTable();
@@ -332,6 +390,7 @@ function clearResult() {
   frequencyData = {};
   currentMapping = {};
   systemGuess = {};
+  previousDecoded = '';
   
   // 表示をクリア
   document.getElementById("frequencyResults").innerHTML = '';

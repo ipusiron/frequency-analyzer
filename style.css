@@ -263,3 +263,25 @@ h3 {
 .copy-btn:hover {
   background: #218838;
 }
+
+/* 変更文字のハイライトアニメーション */
+.changed-char {
+  background-color: #ffeb3b !important;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background-color 1s ease;
+}
+
+.changed-char.fade-out {
+  background-color: transparent !important;
+}
+
+@keyframes highlight-flash {
+  0% { background-color: #ffeb3b; }
+  20% { background-color: #fff59d; }
+  100% { background-color: #ffeb3b; }
+}
+
+.changed-char.just-changed {
+  animation: highlight-flash 0.5s ease;
+}
