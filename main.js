@@ -1,55 +1,61 @@
-function analyze() {
-  const input = document.getElementById("cipherText").value;
-  const sanitized = input.toUpperCase().replace(/[^A-Z]/g, '');
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>頻度分析ツール（Frequency Analyzer）</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>頻度分析ツール（Frequency Analyzer）</h1>
+  
+  <div style="background: #e7f3ff; padding: 12px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #007bff;">
+    💡 <strong>暗号文作成：</strong> <a href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" style="color: #007bff; text-decoration: none;">Caesar Cipher Wheel Tool</a> で暗号文を作成できます。
+  </div>
+  
+  <textarea id="cipherText" rows="6" placeholder="暗号文を入力してください">LW LV LPSRVVLEOH WR VDB KRZ ILUVW WKH LGHD HQWHUHG PB EUDLQ; EXW RQFH FRQFHLYHG, LW KDXQWHG PH GDB DQG QLJKW.</textarea>
+  
+  <div class="controls">
+    <button onclick="analyze()">頻度分析</button>
+    <button onclick="clearMapping()" class="clear-btn">マッピングクリア</button>
+  </div>
 
-  const counts = {};
-  for (const char of sanitized) {
-    counts[char] = (counts[char] || 0) + 1;
-  }
+  <div class="container">
+    <div class="frequency-table">
+      <h3>頻度表</h3>
+      <div id="frequencyResults"></div>
+      <div class="chart-container">
+        <div class="chart-title">文字出現頻度グラフ</div>
+        <svg id="frequencyChart" class="frequency-chart" viewBox="0 0 400 200">
+          <!-- グラフがここに描画されます -->
+        </svg>
+      </div>
+    </div>
+    
+    <div class="mapping-table">
+      <h3>文字マッピング (A-Z)</h3>
+      <div class="mapping-container">
+        <div class="mapping-header">
+          <span>暗号文文字</span>
+          <span>システム推測</span>
+          <span></span>
+          <span>手動調整</span>
+          <span>候補文字</span>
+        </div>
+        <div id="mappingTable"></div>
+      </div>
+    </div>
+  </div>
 
-  const total = sanitized.length;
+  <div class="results">
+    <h3>解読結果</h3>
+    <div id="decodedText">マッピングを設定すると解読結果が表示されます</div>
+    <div class="result-controls">
+      <button onclick="copyResult()" class="copy-btn">📋 コピー</button>
+      <button onclick="clearResult()" class="clear-btn">🗑️ クリア</button>
+    </div>
+  </div>
 
-  const sortedByFreq = Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .map(entry => entry[0]);
-
-  const englishFreq = "ETAOINSHRDLCUMWFGYPBVKJXQZ".split("");
-
-  // 文字対応の推測マッピングを作成
-  const guessMap = {};
-  sortedByFreq.forEach((cipherChar, i) => {
-    guessMap[cipherChar] = englishFreq[i] || '?';
-  });
-
-  // 推測マッピングによる平文生成
-  let decoded = '';
-  for (const c of input) {
-    const upper = c.toUpperCase();
-    if (upper >= 'A' && upper <= 'Z') {
-      const guessed = guessMap[upper] || '?';
-      // 元の大文字小文字を保持
-      decoded += (c === c.toLowerCase()) ? guessed.toLowerCase() : guessed;
-    } else {
-      decoded += c;
-    }
-  }
-
-  // 出力表示
-  const freqLines = Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([char, count], idx) => {
-      const percent = ((count / total) * 100).toFixed(2);
-      const guess = guessMap[char] || '?';
-      return `${char}: ${count} (${percent}%) ⇒ likely: ${guess}`;
-    });
-
-  const output = `
-[Frequency Table]
-${freqLines.join("\n")}
-
-[Guessed Plaintext]
-${decoded}
-  `.trim();
-
-  document.getElementById("results").innerText = output;
-}
+  <script src="main.js"></script>
+</body>
+</html>
