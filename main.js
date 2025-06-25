@@ -1,54 +1,55 @@
 function analyze() {
   const input = document.getElementById("cipherText").value;
-  const counts = {};
-  const total = input.replace(/[^A-Za-z]/g, "").length;
+  const sanitized = input.toUpperCase().replace(/[^A-Z]/g, '');
 
-  for (const char of input.toUpperCase()) {
-    if (char.match(/[A-Z]/)) {
-      counts[char] = (counts[char] || 0) + 1;
+  const counts = {};
+  for (const char of sanitized) {
+    counts[char] = (counts[char] || 0) + 1;
+  }
+
+  const total = sanitized.length;
+
+  const sortedByFreq = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(entry => entry[0]);
+
+  const englishFreq = "ETAOINSHRDLCUMWFGYPBVKJXQZ".split("");
+
+  // 文字対応の推測マッピングを作成
+  const guessMap = {};
+  sortedByFreq.forEach((cipherChar, i) => {
+    guessMap[cipherChar] = englishFreq[i] || '?';
+  });
+
+  // 推測マッピングによる平文生成
+  let decoded = '';
+  for (const c of input) {
+    const upper = c.toUpperCase();
+    if (upper >= 'A' && upper <= 'Z') {
+      const guessed = guessMap[upper] || '?';
+      // 元の大文字小文字を保持
+      decoded += (c === c.toLowerCase()) ? guessed.toLowerCase() : guessed;
+    } else {
+      decoded += c;
     }
   }
 
-  const frequencies = Object.entries(counts)
+  // 出力表示
+  const freqLines = Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
-    .map(([char, count]) => {
+    .map(([char, count], idx) => {
       const percent = ((count / total) * 100).toFixed(2);
-      const guess = guessPlaintextChar(char);
+      const guess = guessMap[char] || '?';
       return `${char}: ${count} (${percent}%) ⇒ likely: ${guess}`;
     });
 
-  document.getElementById("results").innerText = frequencies.join("\n");
-}
+  const output = `
+[Frequency Table]
+${freqLines.join("\n")}
 
-function guessPlaintextChar(cipherChar) {
-  const englishFreq = "ETAOINSHRDLCUMWFGYPBVKJXQZ";
-  const commonMap = {
-    A: "E",
-    B: "T",
-    C: "A",
-    D: "O",
-    E: "I",
-    F: "N",
-    G: "S",
-    H: "H",
-    I: "R",
-    J: "D",
-    K: "L",
-    L: "C",
-    M: "U",
-    N: "M",
-    O: "W",
-    P: "F",
-    Q: "G",
-    R: "Y",
-    S: "P",
-    T: "B",
-    U: "V",
-    V: "K",
-    W: "J",
-    X: "X",
-    Y: "Q",
-    Z: "Z"
-  };
-  return commonMap[cipherChar] || "?";
+[Guessed Plaintext]
+${decoded}
+  `.trim();
+
+  document.getElementById("results").innerText = output;
 }
