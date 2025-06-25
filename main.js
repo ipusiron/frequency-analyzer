@@ -56,6 +56,10 @@
     </div>
   </div>
 
+<div style="margin-top: 30px; padding: 15px; text-align: center; border-top: 1px solid var(--border-color); color: var(--text-color);">
+	🔗 GitHubリポジトリはこちら（<a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" style="color: var(--link-color); text-decoration: none;">ipusiron/frequency-analyzer</a>）
+</div>
+
   <script src="main.js"></script>
 </body>
 </html>
