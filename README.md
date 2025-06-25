@@ -13,7 +13,9 @@
 
 以下は実際の画面例です。
 
-![screenshot](screenshot.png) <!-- 必要に応じて画像を追加 -->
+>![screenshot](screenshot.png)
+>
+> *初期画面*
 
 ## 🔍 概要
 
