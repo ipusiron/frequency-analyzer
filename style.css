@@ -1,0 +1,28 @@
+body {
+  font-family: sans-serif;
+  background: #f8f9fa;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+#results {
+  white-space: pre-wrap;
+  font-family: monospace;
+  background: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
