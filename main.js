@@ -6,6 +6,16 @@ let previousDecoded = '';
 function analyze() {
   const input = document.getElementById("cipherText").value;
   const sanitized = input.toUpperCase().replace(/[^A-Z]/g, '');
+  
+  // 非英字文字が含まれているかチェック
+  const hasNonAlpha = input.length !== sanitized.length;
+  const warningElement = document.getElementById("nonAlphaWarning");
+  
+  if (hasNonAlpha) {
+    warningElement.style.display = "block";
+  } else {
+    warningElement.style.display = "none";
+  }
 
   const counts = {};
   for (const char of sanitized) {
@@ -391,6 +401,9 @@ function clearResult() {
   currentMapping = {};
   systemGuess = {};
   previousDecoded = '';
+  
+  // 警告メッセージを非表示
+  document.getElementById("nonAlphaWarning").style.display = "none";
   
   // 表示をクリア
   document.getElementById("frequencyResults").innerHTML = '';

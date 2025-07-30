@@ -291,3 +291,14 @@ h3 {
 .changed-char.just-changed {
   animation: highlight-flash 0.5s ease;
 }
+
+.warning-message {
+  background: #fff3cd;
+  color: #856404;
+  padding: 10px 12px;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  border-left: 4px solid #ffc107;
+}

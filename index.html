@@ -15,6 +15,10 @@
   
   <textarea id="cipherText" rows="6" placeholder="暗号文を入力してください">LW LV LPSRVVLEOH WR VDB KRZ ILUVW WKH LGHD HQWHUHG PB EUDLQ; EXW RQFH FRQFHLYHG, LW KDXQWHG PH GDB DQG QLJKW.</textarea>
   
+  <div id="nonAlphaWarning" class="warning-message" style="display: none;">
+    ℹ️ 入力には空白・記号・数字が含まれています。これらは頻度分析の対象外ですが、解読結果にはそのまま表示されます。
+  </div>
+  
   <div class="controls">
     <button onclick="analyze()">頻度分析</button>
     <button onclick="clearMapping()" class="clear-btn">マッピングクリア</button>
