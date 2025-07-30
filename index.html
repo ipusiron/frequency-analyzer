@@ -20,8 +20,12 @@
   </div>
   
   <div class="controls">
-    <button onclick="analyze()">頻度分析</button>
-    <button onclick="clearMapping()" class="clear-btn">マッピングクリア</button>
+    <div>
+      <button onclick="analyze()">📊 頻度分析</button>
+    </div>
+    <div>
+      <button onclick="clearResult()" class="clear-btn">🗑️ クリア</button>
+    </div>
   </div>
 
   <div class="container">
@@ -37,7 +41,10 @@
     </div>
     
     <div class="mapping-table">
-      <h3>文字マッピング (A-Z)</h3>
+      <div class="mapping-header-row">
+        <h3>文字マッピング (A-Z)</h3>
+        <button onclick="clearMapping()" class="reset-btn">🔄 リセット</button>
+      </div>
       <div class="mapping-container">
         <div class="mapping-header">
           <span>暗号文文字</span>
@@ -53,15 +60,14 @@
 
   <div class="results">
     <h3>解読結果</h3>
-    <div id="decodedText">マッピングを設定すると解読結果が表示されます</div>
+    <textarea id="decodedText" readonly rows="8" placeholder="マッピングを設定すると解読結果が表示されます"></textarea>
     <div class="result-controls">
       <button onclick="copyResult()" class="copy-btn">📋 コピー</button>
-      <button onclick="clearResult()" class="clear-btn">🗑️ クリア</button>
     </div>
   </div>
 
   <div style="margin-top: 30px; padding: 15px; text-align: center; border-top: 1px solid #dee2e6; color: #6c757d;">
-    🔗 GitHubリポジトリはこちら（<a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" style="color: #007bff; text-decoration: none;">ipusiron/frequency-analyzer</a>）
+    🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" style="color: #007bff; text-decoration: none;">ipusiron/frequency-analyzer</a> ）
   </div>
 
   <script src="main.js"></script>

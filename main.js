@@ -244,53 +244,15 @@ function decodeText() {
 function displayDecodedTextWithHighlight(newDecoded) {
   const decodedElement = document.getElementById("decodedText");
   
-  // 文字単位でspan要素に分割
-  let htmlContent = '';
-  const changedPositions = [];
+  // textareaの場合はプレーンテキストで表示
+  decodedElement.value = newDecoded;
   
-  for (let i = 0; i < newDecoded.length; i++) {
-    const currentChar = newDecoded[i];
-    const previousChar = previousDecoded[i] || '';
-    const isChanged = currentChar !== previousChar && previousDecoded !== '';
-    
-    if (isChanged) {
-      changedPositions.push(i);
-    }
-    
-    if (currentChar.match(/[a-zA-Z*?]/)) {
-      htmlContent += `<span class="char-${i}${isChanged ? ' changed-char just-changed' : ''}">${currentChar}</span>`;
-    } else {
-      htmlContent += currentChar;
-    }
-  }
-  
-  decodedElement.innerHTML = htmlContent;
-  
-  // 変更された文字のアニメーション処理
-  if (changedPositions.length > 0) {
+  // 変更があった場合の視覚的フィードバック（背景色の一時変更）
+  if (newDecoded !== previousDecoded && previousDecoded !== '') {
+    decodedElement.style.backgroundColor = '#fff3cd';
     setTimeout(() => {
-      changedPositions.forEach(pos => {
-        const element = decodedElement.querySelector(`.char-${pos}`);
-        if (element) {
-          element.classList.remove('just-changed');
-        }
-      });
-    }, 500);
-    
-    // 5秒後にフェードアウト開始
-    setTimeout(() => {
-      changedPositions.forEach(pos => {
-        const element = decodedElement.querySelector(`.char-${pos}`);
-        if (element) {
-          element.classList.add('fade-out');
-          
-          // フェードアウト完了後にクラスを削除
-          setTimeout(() => {
-            element.classList.remove('changed-char', 'fade-out');
-          }, 1000);
-        }
-      });
-    }, 5000);
+      decodedElement.style.backgroundColor = '#f8f9fa';
+    }, 300);
   }
 }
 
@@ -378,7 +340,7 @@ function clearMapping() {
 }
 
 function copyResult() {
-  const resultText = document.getElementById("decodedText").textContent;
+  const resultText = document.getElementById("decodedText").value;
   navigator.clipboard.writeText(resultText).then(() => {
     // 一時的にボタンのテキストを変更してフィードバック
     const button = document.querySelector('.copy-btn');
@@ -396,7 +358,8 @@ function copyResult() {
 
 function clearResult() {
   document.getElementById("cipherText").value = '';
-  document.getElementById("decodedText").textContent = 'マッピングを設定すると解読結果が表示されます';
+  document.getElementById("decodedText").value = '';
+  document.getElementById("decodedText").placeholder = 'マッピングを設定すると解読結果が表示されます';
   frequencyData = {};
   currentMapping = {};
   systemGuess = {};
