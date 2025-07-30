@@ -230,6 +230,12 @@ button:hover {
   margin-bottom: 15px;
   margin-top: 10px;
   font-weight: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .result-controls {
