@@ -398,7 +398,39 @@ function clearResult() {
   document.getElementById('frequencyChart').innerHTML = '';
 }
 
+function loadTextFromURL() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const textParam = urlParams.get('text');
+    
+    if (textParam) {
+      // URLデコード
+      const decodedText = decodeURIComponent(textParam);
+      
+      // 文字数制限チェック（5,000文字）
+      if (decodedText.length > 5000) {
+        console.warn('Text parameter exceeds 5,000 character limit');
+        return false;
+      }
+      
+      // 入力欄にセット
+      const textArea = document.getElementById("cipherText");
+      textArea.value = decodedText;
+      
+      return true;
+    }
+  } catch (error) {
+    console.error('Error processing URL text parameter:', error);
+  }
+  
+  return false;
+}
+
 // 初期化
 window.onload = function() {
+  // URLパラメータからテキストを読み込み、なければデフォルトのまま
+  loadTextFromURL();
+  
+  // 解析実行
   analyze();
 };
