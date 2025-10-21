@@ -54,12 +54,14 @@
 ### 🧪 ヴィジュネル暗号の解読補助として使うには？
 
 1. 暗号文から鍵長を推定します。例えば、カシスキー法などが有効な方法です。
-2. 鍵長が `n` のとき、以下のように `n` 分割します。以下はLinuxのコマンド例です。
+2. 鍵長が `5` のとき、以下のように `5` 分割します。以下はLinuxのコマンド例です。
 
 ```bash
 cat cipher.txt | fold -w1 | awk 'NR%5==1' > col1.txt
 cat cipher.txt | fold -w1 | awk 'NR%5==2' > col2.txt
-# ...
+cat cipher.txt | fold -w1 | awk 'NR%5==3' > col3.txt
+cat cipher.txt | fold -w1 | awk 'NR%5==4' > col4.txt
+cat cipher.txt | fold -w1 | awk 'NR%5==5' > col5.txt
 ```
 
 ## 🔥 このツールについて
