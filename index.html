@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
   <title>頻度分析ツール（Frequency Analyzer）</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -10,7 +11,7 @@
   <h1>頻度分析ツール（Frequency Analyzer）</h1>
   
   <div style="background: #e7f3ff; padding: 12px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #007bff;">
-    💡 <strong>暗号文作成：</strong> <a href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" style="color: #007bff; text-decoration: none;">Caesar Cipher Wheel Tool</a> で暗号文を作成できます。
+    💡 <strong>暗号文作成：</strong> <a href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: none;">Caesar Cipher Wheel Tool</a> で暗号文を作成できます。
   </div>
   
   <textarea id="cipherText" rows="6" placeholder="暗号文を入力してください">LW LV LPSRVVLEOH WR VDB KRZ ILUVW WKH LGHD HQWHUHG PB EUDLQ; EXW RQFH FRQFHLYHG, LW KDXQWHG PH GDB DQG QLJKW.</textarea>
@@ -21,10 +22,10 @@
   
   <div class="controls">
     <div>
-      <button onclick="analyze()">📊 頻度分析</button>
+      <button id="analyzeBtn">📊 頻度分析</button>
     </div>
     <div>
-      <button onclick="clearResult()" class="clear-btn">🗑️ クリア</button>
+      <button id="clearBtn" class="clear-btn">🗑️ クリア</button>
     </div>
   </div>
 
@@ -43,7 +44,7 @@
     <div class="mapping-table">
       <div class="mapping-header-row">
         <h3>文字マッピング (A-Z)</h3>
-        <button onclick="clearMapping()" class="reset-btn">🔄 リセット</button>
+        <button id="resetMappingBtn" class="reset-btn">🔄 リセット</button>
       </div>
       <div class="mapping-container">
         <div class="mapping-header">
@@ -62,12 +63,12 @@
     <h3>解読結果</h3>
     <textarea id="decodedText" readonly rows="8" placeholder="マッピングを設定すると解読結果が表示されます"></textarea>
     <div class="result-controls">
-      <button onclick="copyResult()" class="copy-btn">📋 コピー</button>
+      <button id="copyBtn" class="copy-btn">📋 コピー</button>
     </div>
   </div>
 
   <div style="margin-top: 30px; padding: 15px; text-align: center; border-top: 1px solid #dee2e6; color: #6c757d;">
-    🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" style="color: #007bff; text-decoration: none;">ipusiron/frequency-analyzer</a> ）
+    🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: none;">ipusiron/frequency-analyzer</a> ）
   </div>
 
   <script src="main.js"></script>

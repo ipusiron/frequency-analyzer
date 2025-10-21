@@ -33,8 +33,14 @@ function analyze() {
       return `${char}: ${count} (${percent}%)`;
     });
 
-  document.getElementById("frequencyResults").innerHTML = 
-    freqLines.map(line => `<div class="frequency-item">${line}</div>`).join('');
+  const frequencyResults = document.getElementById("frequencyResults");
+  frequencyResults.innerHTML = '';
+  freqLines.forEach(line => {
+    const div = document.createElement('div');
+    div.className = 'frequency-item';
+    div.textContent = line;
+    frequencyResults.appendChild(div);
+  });
 
   // システム推測の生成
   generateSystemGuess();
@@ -406,7 +412,13 @@ function loadTextFromURL() {
 window.onload = function() {
   // URLパラメータからテキストを読み込み、なければデフォルトのまま
   loadTextFromURL();
-  
+
+  // イベントリスナーの設定
+  document.getElementById('analyzeBtn').addEventListener('click', analyze);
+  document.getElementById('clearBtn').addEventListener('click', clearResult);
+  document.getElementById('resetMappingBtn').addEventListener('click', clearMapping);
+  document.getElementById('copyBtn').addEventListener('click', copyResult);
+
   // 解析実行
   analyze();
 };
