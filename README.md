@@ -17,7 +17,7 @@ Frequency Analyzerは、英文ベースの暗号文を対象とした頻度分�
 
 以下は実際の画面例です。
 
->![screenshot](screenshot.png)
+>![screenshot](assets/screenshot.png)
 >
 > *初期画面*
 
