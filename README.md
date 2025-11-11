@@ -97,7 +97,7 @@ https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 - [古典暗号のビジュアル解読法　ー生成AIツールで挑む暗号文の謎解きー](https://www.docswell.com/s/ipusiron/Z37Y8D-2025-08-23-155721)
 
 <a href="https://www.docswell.com/s/ipusiron/Z37Y8D-2025-08-23-155721">
-  <img src="assets/docswell_Z37Y8D_thumb.png" alt="古典暗号のビジュアル解読法" width="300">
+  <img src="assets/docswell_Z37Y8D_thumb.png" alt="古典暗号のビジュアル解読法" width="450">
 </a>
 
 ---
