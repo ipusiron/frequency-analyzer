@@ -1,3 +1,36 @@
+<!--
+---
+id: day009
+slug: frequency-analyzer
+
+title: "Frequency Analyzer"
+
+subtitle_ja: "頻度分析ツール"
+subtitle_en: "Frequency Analysis Tool for Classical Cipher Decryption"
+
+description_ja: "英文ベースの暗号文を対象とした頻度分析＆解読ツール。シーザー暗号や単一換字式暗号の解読に役立ちます。"
+description_en: "A frequency analysis and decryption tool for English-based ciphertext. Useful for breaking Caesar ciphers and monoalphabetic substitution ciphers."
+
+category_ja:
+  - 暗号解析
+  - 古典暗号
+category_en:
+  - Cryptanalysis
+  - Classical Cryptography
+
+difficulty: 1
+
+tags:
+  - frequency-analysis
+  - cryptanalysis
+
+repo_url: "https://github.com/ipusiron/frequency-analyzer"
+demo_url: "https://ipusiron.github.io/frequency-analyzer/"
+
+hub: true
+---
+-->
+
 # 頻度分析ツール（Frequency Analyzer）
 
 **Day 9 - 生成AIで作るセキュリティツール100**
