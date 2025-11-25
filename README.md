@@ -18,7 +18,7 @@ category_en:
   - Cryptanalysis
   - Classical Cryptography
 
-difficulty: 1
+difficulty: 2
 
 tags:
   - frequency-analysis
