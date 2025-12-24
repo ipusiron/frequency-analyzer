@@ -13,20 +13,29 @@
   <div style="background: #e7f3ff; padding: 12px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #007bff;">
     💡 <strong>暗号文作成：</strong> <a href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: none;">Caesar Cipher Wheel Tool</a> で暗号文を作成できます。
   </div>
-  
+
+  <div class="input-label-container">
+    <label for="cipherText">解読対象の暗号文を入力してください。</label>
+    <span class="help-icon" data-tooltip="大文字は暗号文文字、小文字は平文文字として扱います。記号・空白はそのまま出力されます。">？</span>
+    <button id="clearBtn" class="clear-btn">🗑️ クリア</button>
+  </div>
   <textarea id="cipherText" rows="6" placeholder="暗号文を入力してください">LW LV LPSRVVLEOH WR VDB KRZ ILUVW WKH LGHD HQWHUHG PB EUDLQ; EXW RQFH FRQFHLYHG, LW KDXQWHG PH GDB DQG QLJKW.</textarea>
   
   <div id="nonAlphaWarning" class="warning-message" style="display: none;">
     ℹ️ 入力には空白・記号・数字が含まれています。これらは頻度分析の対象外ですが、解読結果にはそのまま表示されます。
   </div>
-  
+
+  <div id="caseProcessingMessage" class="info-message" style="display: none;">
+    大文字を暗号文文字、小文字を平文文字として扱いました。
+  </div>
+
+  <div id="charStats" class="stats-message" style="display: none;">
+    暗号文文字の種類: <span id="cipherCharCount">0</span>種 (<span id="cipherCharList"></span>)、
+    確定平文文字の種類: <span id="plainCharCount">0</span>種 (<span id="plainCharList"></span>)
+  </div>
+
   <div class="controls">
-    <div>
-      <button id="analyzeBtn">📊 頻度分析</button>
-    </div>
-    <div>
-      <button id="clearBtn" class="clear-btn">🗑️ クリア</button>
-    </div>
+    <button id="analyzeBtn">📊 頻度分析</button>
   </div>
 
   <div class="container">
@@ -43,7 +52,7 @@
     
     <div class="mapping-table">
       <div class="mapping-header-row">
-        <h3>文字マッピング (A-Z)</h3>
+        <h3>文字マッピング</h3>
         <button id="resetMappingBtn" class="reset-btn">🔄 リセット</button>
       </div>
       <div class="mapping-container">

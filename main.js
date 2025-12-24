@@ -2,27 +2,51 @@ let frequencyData = {};
 let currentMapping = {};
 let systemGuess = {};
 let previousDecoded = '';
+let confirmedPlainChars = new Set(); // 確定平文文字（小文字で入力された文字）
 
 function analyze() {
   const input = document.getElementById("cipherText").value;
-  const sanitized = input.toUpperCase().replace(/[^A-Z]/g, '');
-  
+
+  // 大文字のみを抽出（暗号文文字）
+  const cipherCharsOnly = input.replace(/[^A-Z]/g, '');
+  // 小文字のみを抽出（平文文字）
+  const plainCharsOnly = input.replace(/[^a-z]/g, '');
+
+  // マッピングをリセット（新しい暗号文の分析時）
+  currentMapping = {};
+
   // 非英字文字が含まれているかチェック
-  const hasNonAlpha = input.length !== sanitized.length;
-  const warningElement = document.getElementById("nonAlphaWarning");
-  
-  if (hasNonAlpha) {
-    warningElement.style.display = "block";
+  const hasNonAlpha = /[^A-Za-z]/.test(input);
+  document.getElementById("nonAlphaWarning").style.display = hasNonAlpha ? "block" : "none";
+
+  // 確定平文文字を更新（小文字を大文字に変換してセットに格納）
+  confirmedPlainChars = new Set([...plainCharsOnly].map(c => c.toUpperCase()));
+
+  // 小文字（平文）が含まれる場合のUI表示
+  const hasLowercase = plainCharsOnly.length > 0;
+  if (hasLowercase) {
+    document.getElementById("caseProcessingMessage").style.display = "block";
+    document.getElementById("charStats").style.display = "block";
+
+    // 統計情報の更新
+    const uniqueCipherChars = [...new Set(cipherCharsOnly)].sort();
+    const uniquePlainChars = [...new Set(plainCharsOnly)].sort();
+    document.getElementById("cipherCharCount").textContent = uniqueCipherChars.length;
+    document.getElementById("cipherCharList").textContent = uniqueCipherChars.join('');
+    document.getElementById("plainCharCount").textContent = uniquePlainChars.length;
+    document.getElementById("plainCharList").textContent = uniquePlainChars.join('');
   } else {
-    warningElement.style.display = "none";
+    document.getElementById("caseProcessingMessage").style.display = "none";
+    document.getElementById("charStats").style.display = "none";
   }
 
+  // 頻度カウント（大文字のみ対象）
   const counts = {};
-  for (const char of sanitized) {
+  for (const char of cipherCharsOnly) {
     counts[char] = (counts[char] || 0) + 1;
   }
 
-  const total = sanitized.length;
+  const total = cipherCharsOnly.length;
   frequencyData = counts;
 
   // 頻度表の表示
@@ -50,7 +74,10 @@ function analyze() {
   
   // 棒グラフの描画
   drawFrequencyChart();
-  
+
+  // 重複チェック
+  checkDuplicates();
+
   // 初回分析時に復号を実行
   decodeText();
 }
@@ -60,7 +87,9 @@ function generateSystemGuess() {
     .sort((a, b) => b[1] - a[1])
     .map(entry => entry[0]);
 
-  const englishFreq = "ETAOINSHRDLCUMWFGYPBVKJXQZ".split("");
+  // ETAOIN順から確定平文文字を除外
+  const englishFreq = "ETAOINSHRDLCUMWFGYPBVKJXQZ".split("")
+    .filter(c => !confirmedPlainChars.has(c));
 
   systemGuess = {};
   // 登場している文字のみにシステム推測を設定
@@ -68,45 +97,45 @@ function generateSystemGuess() {
     systemGuess[cipherChar] = englishFreq[i] || '?';
   });
 
+  // 現在の暗号文に存在しない文字のマッピングを削除
+  Object.keys(currentMapping).forEach(char => {
+    if (!frequencyData[char]) {
+      delete currentMapping[char];
+    }
+  });
+
   // 現在のマッピングにシステム推測をデフォルト設定（登場している文字のみ）
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  alphabet.split('').forEach(char => {
-    if (frequencyData[char] && !currentMapping.hasOwnProperty(char)) {
+  sortedByFreq.forEach(char => {
+    if (!currentMapping.hasOwnProperty(char)) {
       currentMapping[char] = systemGuess[char] || '';
     }
   });
 }
 
 function createMappingTable() {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const mappingHtml = alphabet.split('').map(char => {
-    const isPresent = frequencyData[char];
+  // 登場している暗号文文字のみを対象（頻度順でソート）
+  const cipherChars = Object.entries(frequencyData)
+    .sort((a, b) => b[1] - a[1])
+    .map(entry => entry[0]);
+
+  const mappingHtml = cipherChars.map(char => {
     const count = frequencyData[char] || 0;
-    const countText = count > 0 ? ` (${count})` : '';
-    const opacity = isPresent ? '' : ' style="opacity: 0.3;"';
+    const countText = ` (${count})`;
     const guess = systemGuess[char] || '';
     const candidates = getCandidates(char);
-    
-    // システム推測欄の表示を決定
-    let systemGuessHtml;
-    if (guess) {
-      // 登場している文字：推測文字を表示
-      systemGuessHtml = `<div class="system-guess">${guess}</div>`;
-    } else {
-      // 登場していない文字：空のdiv（半角スペース）
-      systemGuessHtml = `<div class="system-guess"> </div>`;
-    }
-    
+
+    const systemGuessHtml = `<div class="system-guess">${guess}</div>`;
+
     return `
-      <div class="mapping-row"${opacity}>
+      <div class="mapping-row">
         <div class="cipher-char">${char}${countText}</div>
         <div class="system-guess-container">${systemGuessHtml}</div>
         <div class="arrow">→</div>
         <div class="mapping-input-container">
-          <input type="text" 
-                 class="mapping-input" 
-                 id="map_${char}" 
-                 maxlength="1" 
+          <input type="text"
+                 class="mapping-input"
+                 id="map_${char}"
+                 maxlength="1"
                  value="${currentMapping[char] || ''}"
                  placeholder="">
         </div>
@@ -116,15 +145,15 @@ function createMappingTable() {
   }).join('');
 
   document.getElementById("mappingTable").innerHTML = mappingHtml;
-  
+
   // イベントリスナーを追加
   setTimeout(() => {
-    alphabet.split('').forEach(char => {
+    cipherChars.forEach(char => {
       const input = document.getElementById(`map_${char}`);
       if (input) {
         input.addEventListener('input', function(event) {
           const plainChar = event.target.value;
-          
+
           if (plainChar === '') {
             currentMapping[char] = '';
           } else if (plainChar === '?') {
@@ -138,7 +167,7 @@ function createMappingTable() {
               return;
             }
           }
-          
+
           checkDuplicates();
           updateCandidates();
           decodeText();
@@ -150,12 +179,12 @@ function createMappingTable() {
 
 function getCandidates(cipherChar) {
   const currentValue = currentMapping[cipherChar];
-  
+
   // 手動調整が入力されている場合は候補を表示しない
   if (currentValue && currentValue !== '' && currentValue !== '?') {
     return '';
   }
-  
+
   // 使用済み文字を取得
   const usedChars = new Set();
   Object.values(currentMapping).forEach(char => {
@@ -163,28 +192,33 @@ function getCandidates(cipherChar) {
       usedChars.add(char);
     }
   });
-  
-  // 未使用の文字を取得
+
+  // 未使用の文字を取得（確定平文文字も除外）
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const available = alphabet.split('').filter(char => !usedChars.has(char));
-  
+  const available = alphabet.split('').filter(char =>
+    !usedChars.has(char) && !confirmedPlainChars.has(char)
+  );
+
   if (available.length === 0) {
     return '';
   }
-  
+
   // 文字のみを8文字まで表示
   const candidates = available.slice(0, 8).join(' ');
   return candidates + (available.length > 8 ? '...' : '');
 }
 
 function updateCandidates() {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  alphabet.split('').forEach(char => {
-    const row = document.querySelector(`#map_${char}`).closest('.mapping-row');
-    if (row) {
-      const candidatesElement = row.querySelector('.candidates');
-      if (candidatesElement) {
-        candidatesElement.textContent = getCandidates(char);
+  // 登場している暗号文文字のみを対象
+  Object.keys(frequencyData).forEach(char => {
+    const input = document.getElementById(`map_${char}`);
+    if (input) {
+      const row = input.closest('.mapping-row');
+      if (row) {
+        const candidatesElement = row.querySelector('.candidates');
+        if (candidatesElement) {
+          candidatesElement.textContent = getCandidates(char);
+        }
       }
     }
   });
@@ -220,29 +254,32 @@ function checkDuplicates() {
 function decodeText() {
   const input = document.getElementById("cipherText").value;
   let decoded = '';
-  
+
   for (const c of input) {
-    const upper = c.toUpperCase();
-    if (upper >= 'A' && upper <= 'Z') {
-      const mapped = currentMapping[upper];
-      if (mapped === '') {
-        decoded += '*'; // 未入力
+    if (c >= 'A' && c <= 'Z') {
+      // 大文字 = 暗号文文字 → マッピングで変換
+      const mapped = currentMapping[c];
+      if (!mapped || mapped === '') {
+        // 未設定は大文字のまま表示
+        decoded += c;
       } else if (mapped === '?') {
-        decoded += '?'; // ?入力
-      } else if (mapped) {
-        // 元の大文字小文字を保持
-        decoded += (c === c.toLowerCase()) ? mapped.toLowerCase() : mapped;
+        decoded += '?';
       } else {
-        decoded += '*'; // マッピングがない場合
+        // 解読済みは小文字で出力
+        decoded += mapped.toLowerCase();
       }
+    } else if (c >= 'a' && c <= 'z') {
+      // 小文字 = 平文文字 → そのまま出力
+      decoded += c;
     } else {
+      // 記号・空白 → そのまま出力
       decoded += c;
     }
   }
 
   // 変更箇所を特定してハイライト表示
   displayDecodedTextWithHighlight(decoded);
-  
+
   // 前回の結果を保存
   previousDecoded = decoded;
 }
@@ -370,10 +407,15 @@ function clearResult() {
   currentMapping = {};
   systemGuess = {};
   previousDecoded = '';
-  
+  confirmedPlainChars = new Set();
+
   // 警告メッセージを非表示
   document.getElementById("nonAlphaWarning").style.display = "none";
-  
+
+  // 新しい要素を非表示
+  document.getElementById("caseProcessingMessage").style.display = "none";
+  document.getElementById("charStats").style.display = "none";
+
   // 表示をクリア
   document.getElementById("frequencyResults").innerHTML = '';
   document.getElementById("mappingTable").innerHTML = '';

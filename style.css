@@ -328,3 +328,90 @@ h3 {
 .reset-btn:hover {
   background: #5a6268;
 }
+
+/* 入力ラベルとヘルプアイコン */
+.input-label-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.input-label-container label {
+  font-weight: bold;
+  color: #333;
+}
+
+.input-label-container .clear-btn {
+  margin-left: auto;
+  margin-bottom: 0;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+  background: #6c757d;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  cursor: help;
+  position: relative;
+}
+
+.help-icon:hover {
+  background: #5a6268;
+}
+
+.help-icon::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: #333;
+  color: white;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 1000;
+  width: 400px;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.help-icon:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 処理メッセージ */
+.info-message {
+  background: #d1ecf1;
+  color: #0c5460;
+  padding: 10px 12px;
+  border: 1px solid #bee5eb;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  border-left: 4px solid #17a2b8;
+}
+
+/* 統計表示 */
+.stats-message {
+  background: #f8f9fa;
+  color: #495057;
+  padding: 10px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  font-family: monospace;
+}

@@ -8,8 +8,8 @@ title: "Frequency Analyzer"
 subtitle_ja: "頻度分析ツール"
 subtitle_en: "Frequency Analysis Tool for Classical Cipher Decryption"
 
-description_ja: "英文ベースの暗号文を対象とした頻度分析＆解読ツール。シーザー暗号や単一換字式暗号の解読に役立ちます。"
-description_en: "A frequency analysis and decryption tool for English-based ciphertext. Useful for breaking Caesar ciphers and monoalphabetic substitution ciphers."
+description_ja: "英文ベースの暗号文を対象とした頻度分析＆解読ツール。単一換字式暗号の解読に役立ちます。"
+description_en: "A frequency analysis and decryption tool for English-based ciphertext. Useful for breaking monoalphabetic substitution ciphers."
 
 category_ja:
   - 暗号解析
@@ -18,11 +18,12 @@ category_en:
   - Cryptanalysis
   - Classical Cryptography
 
-difficulty: 2
+difficulty: 3
 
 tags:
   - frequency-analysis
   - cryptanalysis
+  - monoalphabetic-substitution-ciphers
 
 repo_url: "https://github.com/ipusiron/frequency-analyzer"
 demo_url: "https://ipusiron.github.io/frequency-analyzer/"
@@ -31,12 +32,12 @@ hub: true
 ---
 -->
 
-# 頻度分析ツール（Frequency Analyzer）
+# Frequency Analyzer - 頻度分析ツール
 
-**Day 9 - 生成AIで作るセキュリティツール100**
+**Day009 - 生成AIで作るセキュリティツール100**
 
 Frequency Analyzerは、英文ベースの暗号文を対象とした頻度分析＆解読ツールです。  
-シーザー暗号や単一換字式暗号の解読に役立ちます。
+単一換字式暗号の解読に役立ちます。
 
 ---
 
@@ -76,15 +77,29 @@ Frequency Analyzerは、英文ベースの暗号文を対象とした頻度分�
 3. 推定されたマッピングが初期設定されており、そのままでも仮想復号が表示されます。
 4. 必要に応じてマッピング欄で手動修正も可能です（重複検出機能あり）。
 5. 「📋 コピー」で解読結果をコピーできます。
-6. 「マッピングクリア」で自動推定にリセットされます。
+6. 「🔄 リセット」でマッピングを自動推定に戻します。
 7. 「🗑️ クリア」で暗号文・表示結果をすべて初期化します。
 
 ---
 
 ## 🔐 入力について
 
-- 入力できる文字は英語（A–Z）で、**空白・記号・改行も含んでOK**です。
-- それ以外の文字は無視されます。
+- 入力できる文字は英語（A–Z、a–z）で、**空白・記号・改行も含んでOK**です。
+- **大文字**は暗号文文字として扱われ、頻度分析の対象になります。
+- **小文字**は確定済みの平文文字として扱われ、そのまま出力されます。
+- 小文字で入力した文字は、システム推測の候補から自動的に除外されます。
+
+### 大文字・小文字の使い分け例
+
+部分的に解読が進んでいる暗号文を入力する場合：
+
+```
+THe QUICk BRoWN foX JUMPs oVeR THe LAZy DoG
+```
+
+この例では：
+- 大文字（T, H, Q, U, I, C, K, B, R, W, N, F, X, J, M, P, S, V, L, A, Z, D, G）→ 暗号文文字として頻度分析
+- 小文字（e, o）→ 確定済み平文としてそのまま出力、システム推測候補から除外
 
 ---
 
@@ -154,7 +169,7 @@ https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 
 - [RepeatSeq Analyzer](https://github.com/ipusiron/repeatseq-analyzer) - 反復文字列の特定ツール（Day028）
 
-3. 3：鍵長を推定したら、ターゲット暗号文を列ごとに分割します。
+3. 鍵長を推定したら、ターゲット暗号文を列ごとに分割します。
 
 たとえば、推定した鍵長が5の場合、暗号文を5つの列に分けることになります。
 これをLinuxコマンドで実現するには、次のように入力します。
@@ -166,6 +181,7 @@ $ cat cipher.txt | fold -w1 | awk 'NR%5==3' > col3.txt
 $ cat cipher.txt | fold -w1 | awk 'NR%5==4' > col4.txt
 $ cat cipher.txt | fold -w1 | awk 'NR%5==0' > col5.txt
 ```
+
 以上は列分割の仕組みを理解してもらうために、あえてLinuxコマンドを例に挙げて説明しました。
 
 しかし、本プロジェクトで開発したModular Text Dividerを使えば、ブラウザー上の操作だけで簡単に列分割を実行できます。
