@@ -136,6 +136,12 @@ https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 
 ## 🧪 ヴィジュネル暗号の解読補助として使うには？
 
+### ゲーム「Cypher」でFrequency Analyzerを利用する
+
+- [MONOALPHABETIC SUBSTITUTION PUZZLE 01【Cypher編】](https://akademeia.info/?p=35916)
+- [MONOALPHABETIC SUBSTITUTION PUZZLE 02【Cypher編】](https://akademeia.info/?p=36034)
+- [MONOALPHABETIC SUBSTITUTION PUZZLE 03【Cypher編】 ](https://akademeia.info/?p=36107)
+
 ### スライド「古典暗号のビジュアル解読法　ー生成AIツールで挑む暗号文の謎解きー」
 
 「ゆるいハッキング大会 第122回」で発表した「古典暗号のビジュアル解読法」では、ヴィジュネル暗号文を自作ツールを使って解読しました。
@@ -242,6 +248,13 @@ Frequency Analyzerは「暗号文の出現頻度」と「英文の文字頻度�
 複数の候補が存在する場合でも、復号結果を比較すれば、英文として成立するものがただ1つに絞り込まれるはずです。
 
 以上が、ヴィジュネル暗号文の解読に至るまでの一連の流れです。
+
+---
+
+## 🔗 関連ツール
+
+- **[Substitution Mapping Mixer](https://github.com/ipusiron/substitution-mapping-mixer) – 換字式暗号の手動解析ワークベンチ**（Day105）
+  - 置換表を試行錯誤で調整するときに役立つ。
 
 ---
 
