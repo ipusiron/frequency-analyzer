@@ -3,35 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none';">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="data:,">
   <title>頻度分析ツール（Frequency Analyzer）</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>頻度分析ツール（Frequency Analyzer）</h1>
-  
-  <div style="background: #e7f3ff; padding: 12px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #007bff;">
-    💡 <strong>暗号文作成：</strong> <a href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: none;">Caesar Cipher Wheel Tool</a> で暗号文を作成できます。
+  <header class="site-header">
+    <h1>頻度分析ツール（Frequency Analyzer）</h1>
+    <button id="themeToggleBtn" class="theme-toggle" type="button" aria-label="ダークモード" aria-pressed="false">🌙</button>
+  </header>
+  <noscript>このツールの利用にはJavaScriptが必要です。</noscript>
+
+  <div class="tool-info">
+    💡 <strong>暗号文作成：</strong><a href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" rel="noopener noreferrer">Caesar Cipher Wheel Tool</a>で暗号文を作成できます。
   </div>
 
   <div class="input-label-container">
     <label for="cipherText">解読対象の暗号文を入力してください。</label>
-    <span class="help-icon" data-tooltip="大文字は暗号文文字、小文字は平文文字として扱います。記号・空白はそのまま出力されます。">？</span>
+    <button id="helpBtn" class="help-icon" type="button" aria-label="入力の説明" aria-expanded="false" aria-controls="inputHelp">？</button>
+    <div id="inputHelp" class="help-tooltip" role="tooltip" hidden>大文字は暗号文文字、小文字は確定平文文字として扱います。記号・空白はそのまま出力されます。</div>
     <button id="clearBtn" class="clear-btn">🗑️ クリア</button>
   </div>
   <textarea id="cipherText" rows="6" placeholder="暗号文を入力してください">LW LV LPSRVVLEOH WR VDB KRZ ILUVW WKH LGHD HQWHUHG PB EUDLQ; EXW RQFH FRQFHLYHG, LW KDXQWHG PH GDB DQG QLJKW.</textarea>
-  
-  <div id="nonAlphaWarning" class="warning-message" style="display: none;">
+
+  <div id="nonAlphaWarning" class="warning-message" hidden>
     ℹ️ 入力には空白・記号・数字が含まれています。これらは頻度分析の対象外ですが、解読結果にはそのまま表示されます。
   </div>
 
-  <div id="caseProcessingMessage" class="info-message" style="display: none;">
+  <div id="caseProcessingMessage" class="info-message" hidden>
     大文字を暗号文文字、小文字を平文文字として扱いました。
   </div>
 
-  <div id="charStats" class="stats-message" style="display: none;">
-    暗号文文字の種類: <span id="cipherCharCount">0</span>種 (<span id="cipherCharList"></span>)、
-    確定平文文字の種類: <span id="plainCharCount">0</span>種 (<span id="plainCharList"></span>)
+  <div id="urlWarning" class="warning-message" role="status" hidden></div>
+  <div id="charStats" class="stats-message" aria-live="polite">
+    <div id="analysisStats"></div>
+    <div id="icStats"></div>
+    <div id="reliabilityNote"></div>
+    <div id="confirmedStats" hidden>
+      暗号文文字の種類: <span id="cipherCharCount">0</span>種 (<span id="cipherCharList"></span>)、
+      確定平文文字の種類: <span id="plainCharCount">0</span>種 (<span id="plainCharList"></span>)
+    </div>
   </div>
 
   <div class="controls">
@@ -40,21 +53,33 @@
 
   <div class="container">
     <div class="frequency-table">
-      <h3>頻度表</h3>
-      <div id="frequencyResults"></div>
+      <h2>頻度表</h2>
+      <div id="frequencyResults" aria-live="polite"></div>
       <div class="chart-container">
-        <div class="chart-title">文字出現頻度グラフ</div>
-        <svg id="frequencyChart" class="frequency-chart" viewBox="0 0 400 200">
+        <div class="chart-title">文字出現頻度グラフ（％）</div>
+        <div class="chart-legend"><span class="legend-observed">観測％（棒）</span><span class="legend-expected">英語の期待％（横線）</span></div>
+        <svg id="frequencyChart" class="frequency-chart" viewBox="0 0 430 200" role="img" aria-label="観測頻度と英語標準頻度の比較">
+          <title>観測％の棒と英語期待％のマーカー</title>
           <!-- グラフがここに描画されます -->
         </svg>
       </div>
+      <section class="ngram-panel" aria-live="polite">
+        <h2>二重字・三重字</h2>
+        <p>語の内側で2回以上のものだけ／上位10件</p>
+        <p>二重字：<span id="bigramResults"></span></p>
+        <p>三重字：<span id="trigramResults"></span></p>
+        <h2>連続同一文字</h2>
+        <p>1回でも全件表示</p>
+        <p id="doubleResults"></p>
+      </section>
     </div>
-    
+
     <div class="mapping-table">
       <div class="mapping-header-row">
-        <h3>文字マッピング</h3>
+        <h2>文字マッピング</h2>
         <button id="resetMappingBtn" class="reset-btn">🔄 リセット</button>
       </div>
+      <p class="guess-note">頻度順位を機械的に対応付けた出発点です。そのままで正解になるとは限りません。</p>
       <div class="mapping-container">
         <div class="mapping-header">
           <span>暗号文文字</span>
@@ -63,23 +88,26 @@
           <span>手動調整</span>
           <span>候補文字</span>
         </div>
-        <div id="mappingTable"></div>
+        <div id="mappingTable" aria-live="polite"></div>
       </div>
+      <p id="duplicateMessage" class="warning-message" aria-live="polite" hidden></p>
     </div>
   </div>
 
   <div class="results">
-    <h3>解読結果</h3>
-    <textarea id="decodedText" readonly rows="8" placeholder="マッピングを設定すると解読結果が表示されます"></textarea>
+    <h2>解読結果</h2>
+    <textarea id="decodedText" readonly rows="8" aria-label="解読結果" aria-live="polite" placeholder="マッピングを設定すると解読結果が表示されます"></textarea>
     <div class="result-controls">
       <button id="copyBtn" class="copy-btn">📋 コピー</button>
     </div>
+    <p id="copyMessage" role="status" aria-live="polite"></p>
   </div>
 
-  <div style="margin-top: 30px; padding: 15px; text-align: center; border-top: 1px solid #dee2e6; color: #6c757d;">
-    🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: none;">ipusiron/frequency-analyzer</a> ）
-  </div>
+  <footer class="site-footer">
+    🔗 GitHubリポジトリはこちら（<a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" rel="noopener noreferrer">ipusiron/frequency-analyzer</a>）
+  </footer>
 
-  <script src="main.js"></script>
+  <script src="freq-logic.js" defer></script>
+  <script src="main.js" defer></script>
 </body>
 </html>
