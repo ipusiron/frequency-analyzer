@@ -5,34 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none';">
   <meta name="referrer" content="no-referrer">
+  <meta name="description" content="英文の暗号文を英語標準頻度・一致指数・n-gramで分析し、単一換字式暗号の手動解読を支援するツール。">
   <link rel="icon" href="data:,">
-  <title>頻度分析ツール（Frequency Analyzer）</title>
+  <title data-i18n="app.title">頻度分析ツール（Frequency Analyzer）</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="site-header">
-    <h1>頻度分析ツール（Frequency Analyzer）</h1>
-    <button id="themeToggleBtn" class="theme-toggle" type="button" aria-label="ダークモード" aria-pressed="false">🌙</button>
+    <h1 data-i18n="app.title">頻度分析ツール（Frequency Analyzer）</h1>
+    <div class="header-buttons">
+      <button id="langToggle" class="lang-toggle" type="button" data-i18n="app.langButton" data-i18n-aria-label="app.langAria" aria-label="言語を切り替える">English</button>
+      <button id="themeToggleBtn" class="theme-toggle" type="button" aria-label="ダークモードに切り替える" aria-pressed="false">🌙</button>
+    </div>
   </header>
-  <noscript>このツールの利用にはJavaScriptが必要です。</noscript>
+  <noscript>このツールの利用にはJavaScriptが必要です。 / This tool requires JavaScript.</noscript>
 
   <div class="tool-info">
-    💡 <strong>暗号文作成：</strong><a href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" rel="noopener noreferrer">Caesar Cipher Wheel Tool</a>で暗号文を作成できます。
+    💡 <strong data-i18n="tool.makerLabel">暗号文作成：</strong><a
+      href="https://ipusiron.github.io/caesar-cipher-wheel/" target="_blank" rel="noopener noreferrer"
+      data-i18n="tool.makerLink">Caesar Cipher Wheel Tool</a><span
+      data-i18n="tool.makerSuffix">で暗号文を作成できます。</span>
   </div>
 
   <div class="input-label-container">
-    <label for="cipherText">解読対象の暗号文を入力してください。</label>
-    <button id="helpBtn" class="help-icon" type="button" aria-label="入力の説明" aria-expanded="false" aria-controls="inputHelp">？</button>
-    <div id="inputHelp" class="help-tooltip" role="tooltip" hidden>大文字は暗号文文字、小文字は確定平文文字として扱います。記号・空白はそのまま出力されます。</div>
-    <button id="clearBtn" class="clear-btn">🗑️ クリア</button>
+    <label for="cipherText" data-i18n="input.label">解読対象の暗号文を入力してください。</label>
+    <button id="helpBtn" class="help-icon" type="button" aria-label="入力の説明" data-i18n-aria-label="help.aria" aria-expanded="false" aria-controls="inputHelp">？</button>
+    <div id="inputHelp" class="help-tooltip" role="tooltip" data-i18n="help.tooltip" hidden>大文字は暗号文文字、小文字は確定平文文字として扱います。記号・空白はそのまま出力されます。</div>
+    <button id="clearBtn" class="clear-btn" data-i18n="button.clear">🗑️ クリア</button>
   </div>
-  <textarea id="cipherText" rows="6" placeholder="暗号文を入力してください">LW LV LPSRVVLEOH WR VDB KRZ ILUVW WKH LGHD HQWHUHG PB EUDLQ; EXW RQFH FRQFHLYHG, LW KDXQWHG PH GDB DQG QLJKW.</textarea>
+  <textarea id="cipherText" rows="6" placeholder="暗号文を入力してください" data-i18n-placeholder="input.placeholder">LW LV LPSRVVLEOH WR VDB KRZ ILUVW WKH LGHD HQWHUHG PB EUDLQ; EXW RQFH FRQFHLYHG, LW KDXQWHG PH GDB DQG QLJKW.</textarea>
 
-  <div id="nonAlphaWarning" class="warning-message" hidden>
+  <div id="nonAlphaWarning" class="warning-message" data-i18n="warning.nonAlpha" hidden>
     ℹ️ 入力には空白・記号・数字が含まれています。これらは頻度分析の対象外ですが、解読結果にはそのまま表示されます。
   </div>
 
-  <div id="caseProcessingMessage" class="info-message" hidden>
+  <div id="caseProcessingMessage" class="info-message" data-i18n="info.caseProcessing" hidden>
     大文字を暗号文文字、小文字を平文文字として扱いました。
   </div>
 
@@ -41,52 +48,49 @@
     <div id="analysisStats"></div>
     <div id="icStats"></div>
     <div id="reliabilityNote"></div>
-    <div id="confirmedStats" hidden>
-      暗号文文字の種類: <span id="cipherCharCount">0</span>種 (<span id="cipherCharList"></span>)、
-      確定平文文字の種類: <span id="plainCharCount">0</span>種 (<span id="plainCharList"></span>)
-    </div>
+    <div id="confirmedStats" hidden></div>
   </div>
 
   <div class="controls">
-    <button id="analyzeBtn">📊 頻度分析</button>
+    <button id="analyzeBtn" data-i18n="button.analyze">📊 頻度分析</button>
   </div>
 
   <div class="container">
     <div class="frequency-table">
-      <h2>頻度表</h2>
+      <h2 data-i18n="freq.heading">頻度表</h2>
       <div id="frequencyResults" aria-live="polite"></div>
       <div class="chart-container">
-        <div class="chart-title">文字出現頻度グラフ（％）</div>
-        <div class="chart-legend"><span class="legend-observed">観測％（棒）</span><span class="legend-expected">英語の期待％（横線）</span></div>
-        <svg id="frequencyChart" class="frequency-chart" viewBox="0 0 430 200" role="img" aria-label="観測頻度と英語標準頻度の比較">
-          <title>観測％の棒と英語期待％のマーカー</title>
+        <div class="chart-title" data-i18n="chart.heading">文字出現頻度グラフ（％）</div>
+        <div class="chart-legend"><span class="legend-observed" data-i18n="chart.legendObserved">観測％（棒）</span><span class="legend-expected" data-i18n="chart.legendExpected">英語の期待％（横線）</span></div>
+        <svg id="frequencyChart" class="frequency-chart" viewBox="0 0 430 200" role="img" aria-label="観測頻度と英語標準頻度の比較" data-i18n-aria-label="chart.svgAria">
+          <title data-i18n="chart.svgTitle">観測％の棒と英語期待％のマーカー</title>
           <!-- グラフがここに描画されます -->
         </svg>
       </div>
       <section class="ngram-panel" aria-live="polite">
-        <h2>二重字・三重字</h2>
-        <p>語の内側で2回以上のものだけ／上位10件</p>
-        <p>二重字：<span id="bigramResults"></span></p>
-        <p>三重字：<span id="trigramResults"></span></p>
-        <h2>連続同一文字</h2>
-        <p>1回でも全件表示</p>
+        <h2 data-i18n="ngram.heading">二重字・三重字</h2>
+        <p data-i18n="ngram.note">語の内側で2回以上のものだけ／上位10件</p>
+        <p><span data-i18n="ngram.bigramLabel">二重字：</span><span id="bigramResults"></span></p>
+        <p><span data-i18n="ngram.trigramLabel">三重字：</span><span id="trigramResults"></span></p>
+        <h2 data-i18n="double.heading">連続同一文字</h2>
+        <p data-i18n="double.note">1回でも全件表示</p>
         <p id="doubleResults"></p>
       </section>
     </div>
 
     <div class="mapping-table">
       <div class="mapping-header-row">
-        <h2>文字マッピング</h2>
-        <button id="resetMappingBtn" class="reset-btn">🔄 リセット</button>
+        <h2 data-i18n="mapping.heading">文字マッピング</h2>
+        <button id="resetMappingBtn" class="reset-btn" data-i18n="button.reset">🔄 リセット</button>
       </div>
-      <p class="guess-note">頻度順位を機械的に対応付けた出発点です。そのままで正解になるとは限りません。</p>
+      <p class="guess-note" data-i18n="mapping.note">頻度順位を機械的に対応付けた出発点です。そのままで正解になるとは限りません。</p>
       <div class="mapping-container">
         <div class="mapping-header">
-          <span>暗号文文字</span>
-          <span>システム推測</span>
+          <span data-i18n="mapping.colCipher">暗号文文字</span>
+          <span data-i18n="mapping.colGuess">システム推測</span>
           <span></span>
-          <span>手動調整</span>
-          <span>候補文字</span>
+          <span data-i18n="mapping.colManual">手動調整</span>
+          <span data-i18n="mapping.colCandidates">候補文字</span>
         </div>
         <div id="mappingTable" aria-live="polite"></div>
       </div>
@@ -95,18 +99,19 @@
   </div>
 
   <div class="results">
-    <h2>解読結果</h2>
-    <textarea id="decodedText" readonly rows="8" aria-label="解読結果" aria-live="polite" placeholder="マッピングを設定すると解読結果が表示されます"></textarea>
+    <h2 data-i18n="results.heading">解読結果</h2>
+    <textarea id="decodedText" readonly rows="8" aria-label="解読結果" data-i18n-aria-label="results.decodedAria" placeholder="マッピングを設定すると解読結果が表示されます" data-i18n-placeholder="results.placeholder"></textarea>
     <div class="result-controls">
-      <button id="copyBtn" class="copy-btn">📋 コピー</button>
+      <button id="copyBtn" class="copy-btn" data-i18n="button.copy">📋 コピー</button>
     </div>
     <p id="copyMessage" role="status" aria-live="polite"></p>
   </div>
 
   <footer class="site-footer">
-    🔗 GitHubリポジトリはこちら（<a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" rel="noopener noreferrer">ipusiron/frequency-analyzer</a>）
+    <span data-i18n="footer.repo">🔗 GitHubリポジトリはこちら（</span><a href="https://github.com/ipusiron/frequency-analyzer" target="_blank" rel="noopener noreferrer">ipusiron/frequency-analyzer</a><span data-i18n="footer.repoEnd">）</span>
   </footer>
 
+  <script src="i18n.js" defer></script>
   <script src="freq-logic.js" defer></script>
   <script src="main.js" defer></script>
 </body>

@@ -190,7 +190,7 @@ button:hover {
 
 .mapping-header {
   display: grid;
-  grid-template-columns: minmax(50px, 1fr) minmax(50px, 1fr) 20px 56px minmax(100px, 1.5fr);
+  grid-template-columns: minmax(50px, 1fr) minmax(50px, 1fr) 20px 68px minmax(100px, 1.5fr);
   background: var(--row-even-bg);
   font-weight: bold;
   font-size: 0.9rem;
@@ -199,7 +199,9 @@ button:hover {
 
 .mapping-header span {
   text-align: center;
-  padding: 12px 8px;
+  /* 見出しの語は途中で折らない。英語のManualが「Manu/al」に割れるのを防ぐ。 */
+  overflow-wrap: normal;
+  padding: 12px 6px;
   border-right: 1px solid var(--heading-color);
   border-bottom: 2px solid var(--heading-color);
 }
@@ -210,7 +212,7 @@ button:hover {
 
 .mapping-row {
   display: grid;
-  grid-template-columns: minmax(50px, 1fr) minmax(50px, 1fr) 20px 56px minmax(100px, 1.5fr);
+  grid-template-columns: minmax(50px, 1fr) minmax(50px, 1fr) 20px 68px minmax(100px, 1.5fr);
   border-bottom: 1px solid var(--border-color);
   background: var(--card-bg);
 }
@@ -522,10 +524,25 @@ button, textarea, input, body {
   gap: 12px;
 }
 
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
 .theme-toggle {
   flex: 0 0 44px;
   padding: 0;
   margin: 0;
+}
+
+.lang-toggle {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .tool-info {
@@ -646,6 +663,15 @@ button, textarea, input, body {
   .mapping-header-row {
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  .header-buttons {
+    gap: 6px;
+  }
+
+  .lang-toggle {
+    padding: 10px 10px;
+    font-size: 0.8rem;
   }
 }
 

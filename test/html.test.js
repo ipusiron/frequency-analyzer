@@ -18,7 +18,8 @@ test('CSPとmeta、インライン禁止、classic deferの順序', () => {
   assert.match(html, /<link rel="icon" href="data:,"/);
   assert.doesNotMatch(html, /\s(?:on\w+|style)\s*=/i);
   const scripts = [...html.matchAll(/<script\b[^>]*>/g)].map(m => m[0]);
-  assert.deepEqual(scripts, ['<script src="freq-logic.js" defer>', '<script src="main.js" defer>']);
+  assert.deepEqual(scripts, ['<script src="i18n.js" defer>',
+    '<script src="freq-logic.js" defer>', '<script src="main.js" defer>']);
   assert.doesNotMatch(html, /type="module"/);
   assert.doesNotMatch(read('main.js'), /innerHTML|alert\(|decodeURIComponent|\.style\.|\bfetch\(|XMLHttpRequest/);
   assert.doesNotMatch(read('freq-logic.js'), /\bdocument\b|\bwindow\b/);
@@ -26,14 +27,15 @@ test('CSPとmeta、インライン禁止、classic deferの順序', () => {
 
 test('操作要素・入力名・live領域・SVG・見出し・外部リンク', () => {
   for (const id of ['cipherText', 'decodedText', 'analyzeBtn', 'clearBtn', 'resetMappingBtn', 'copyBtn',
-    'mappingTable', 'frequencyChart', 'frequencyResults', 'themeToggleBtn']) {
+    'mappingTable', 'frequencyChart', 'frequencyResults', 'themeToggleBtn', 'langToggle']) {
     assert.ok(html.includes(`id="${id}"`), id);
   }
   assert.match(html, /<label for="cipherText"/);
   assert.match(html, /<textarea id="decodedText"[^>]+aria-label="[^"]+"/);
   assert.match(html, /id="charStats"[^>]+aria-live="polite"/);
   assert.match(html, /<svg[^>]+role="img"[^>]+aria-label="[^"]+"/);
-  assert.match(html, /<title>観測％/);
+  // SVGのtitleは言語で変わるので、文言ではなく辞書のキーで固定する。
+  assert.match(html, /<svg[\s\S]*?<title data-i18n="chart\.svgTitle">/);
   assert.match(html, /id="helpBtn"[^>]+aria-expanded="false"/);
   const headings = [...html.matchAll(/<h([1-6])\b/g)].map(m => Number(m[1]));
   assert.equal(headings[0], 1);

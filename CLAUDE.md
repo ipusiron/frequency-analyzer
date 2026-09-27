@@ -30,6 +30,7 @@
 
 - 定数：`ENGLISH_FREQ`、`ETAOIN_ORDER`
 - 集計：`analyzeText`、`indexOfCoincidence`、`classifyIC`、`isICReliable`
+  - `classifyIC`と`readTextParam`は文言ではなく辞書のキー（`ic.*`・`url.*`）を返す。
 - 語内の集計：`wordsOf`、`ngramCounts`、`doubledLetters`
 - マッピング：`systemGuess`、`candidatesFor`、`mergeMapping`、`decodeWithMapping`
 - URLパラメーター：`readTextParam`（URLSearchParamsを受け取る）
@@ -45,15 +46,25 @@ ES moduleにはしません。
 - `decodeText()`：復号結果と変更ハイライトを更新する。
 - `drawFrequencyChart()`：観測％の棒、背景色の下線、期待％のマーカーを描く。
 - テーマ・ヘルプ・コピー：保存値の検証、Escで閉じるヘルプ、手動コピーへの代替処理
+- `initializeLanguage()`：`I18n.init()`と`#langToggle`の配線、`languagechange`での再描画
+
+**日英の切り替え（`i18n.js`）**
+
+- `ja`・`en`の辞書、`t(key, values)`、`data-i18n`系の適用、`?lang`と`localStorage`の解決
+- 表示側は言語ごとの文字列を持たない。文言を足すときは辞書へ足す。
+- 状態で変わる属性（テーマボタンの`aria-label`）は`apply()`に任せず、`applyTheme()`で組み立てる。
+- 一時表示（コピー完了、重複、URL警告）は`dataset`にキーを覚え、`languagechange`で訳し直す。
+- クリア直後は`isCleared`が真なので、言語を変えても再分析しない。
 
 **その他のファイル**
 
 - `style.css`：ライト・ダークのCSS変数、768px以下の1カラム表示
-- `test/`：freq-logic・urlparam・readme・html・contrast・formatの6ファイル
+- `test/`：freq-logic・urlparam・readme・html・contrast・format・i18nの7ファイル
 - `.github/workflows/test.yml`：pushとpull_requestでNode 22のテスト
 - `package.json`：npm testコマンド
 - `assets/`：画像4枚と既存のDocswellサムネイル
 - `LICENSE`：Copyright (c) 2025 ipusironのMITライセンス
+- `README.md`・`README.en.md`：日本語版と英語版。機能や構造を変えたら両方直す。
 
 **Data Flow**:
 
@@ -80,10 +91,11 @@ ICの30字境界は低信頼を示す目安です。システム推測のETAOIN�
 ### Safety Rules
 
 - 入力を外部送信せず、依存・CDN・fetchを追加しない。
-- localStorageには検証済みのテーマだけを保存する。
+- localStorageには検証済みのテーマと表示言語だけを保存する。言語の保存は`i18n.js`に閉じ込める。
 - CSPのmetaにframe-ancestorsを書かない。metaでは適用されないためである。
 - 頻度表や期待値を変更するときはnpm testを通す。期待値の書き換えだけで通さない。
 - 初期暗号文とETAOIN方式、既存Docswell画像を保持する。
+- ICのしきい値（0.060・0.045）と30字の境界は、日英対応でも変更しない。
 
 ### Security Tool Context
 
