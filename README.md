@@ -34,6 +34,8 @@ hub: true
 
 # Frequency Analyzer - 頻度分析ツール
 
+[English](README.en.md) · 日本語
+
 ![GitHub Repo stars](https://img.shields.io/github/stars/ipusiron/frequency-analyzer?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/ipusiron/frequency-analyzer?style=social)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ipusiron/frequency-analyzer)
@@ -87,6 +89,7 @@ Frequency Analyzerは、英文ベースの暗号文を対象とした頻度分�
 - **結果のコピー・クリア機能**
 - 英語標準頻度との比較、一致指数、語内の二重字・三重字と連続同一文字の集計
 - 再分析時の手動マッピング保持、ライト・ダーク切替、モバイル表示
+- 日本語・英語の表示切り替え（ヘッダーのボタン、`?lang=ja`・`?lang=en`、選択は保存する）
 
 ---
 
@@ -99,6 +102,7 @@ Frequency Analyzerは、英文ベースの暗号文を対象とした頻度分�
 5. 「📋 コピー」で解読結果をコピーする。使えない環境では結果を選択して手動コピーする。
 6. 「🔄 リセット」で手動調整を解除し、自動推測に戻す。
 7. 「🗑️ クリア」で暗号文・表示結果をすべて初期化する。
+8. ヘッダーの「English」ボタンで英語表示に切り替える。分析結果は消えず、そのまま訳し直される。
 
 ---
 
@@ -159,6 +163,7 @@ https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 - n-gram：語内の二重字・三重字は2回以上の上位10件、連続同一文字は1回でも全件
 - マッピング表：システム推測、手動調整、頻度順の候補（最大8件と残り件数）
 - 解読結果：小文字への置換、変更ハイライト、コピー通知
+- 言語：ヘッダーのボタンで日英を切り替える。統計・グラフ・n-gram・候補・通知まで訳し直す
 
 候補は使用済み文字・確定平文文字・その行の現在値を除きます。
 初期状態の各行は`K J X Q Z`、Hの手動欄を空にすると`E K J X Q Z`です。
@@ -405,7 +410,7 @@ ETAOINの素朴な順位対応付けは、初期暗号文の21文字中2文字�
 ## 🔒 セキュリティ
 
 入力テキストを外部へ送信しません。アプリは外部通信を行わず、必要なJSとCSSは同じ配信元から読み込みます。
-入力やマッピングは保存せず、ライト・ダークの選択だけを`localStorage`に保存します。
+入力やマッピングは保存せず、ライト・ダークの選択と表示言語だけを`localStorage`に保存します。
 URLに暗号文を含めた場合はアドレスやブラウザー履歴、配信サーバーのアクセスログに残る可能性があります。
 
 CSPをmetaで設定し、外部スクリプト、インラインスクリプト・スタイル、オブジェクト、フォーム送信などを制限しています。
@@ -424,7 +429,7 @@ GitHub Pagesの標準配信では任意のレスポンスヘッダーを設定�
 
 Node 22以上で`npm test`を実行します。`node --test`を使い、npm依存はありません。
 GitHub Actionsでpushとpull_requestのたびに自動実行します。
-頻度・IC・n-gram・候補・手動値の保持・復号・URL処理・HTML・コントラスト・整形を検証します。
+頻度・IC・n-gram・候補・手動値の保持・復号・URL処理・HTML・コントラスト・整形・日英辞書を検証します。
 READMEの表の数値、復号例、画像参照も実コードから再計算して確認しています。
 
 ## ❓ FAQ
@@ -453,15 +458,17 @@ ETAOINは出現順位を対応付けるだけです。短文や文章の内容�
 ```text
 frequency-analyzer/
 ├── index.html          # 入力・統計・グラフ・マッピング画面
+├── i18n.js             # 日本語・英語の辞書と切り替え
 ├── freq-logic.js       # DOMに触れない解析・復号ロジック
 ├── main.js             # DOMの更新とイベント処理
 ├── style.css           # レスポンシブ表示と両テーマの配色
 ├── assets/             # スクリーンショット4枚と既存スライド画像
-├── test/               # node:testによる6つのテストファイル
+├── test/               # node:testによる7つのテストファイル（test/i18n.test.jsを含む）
 ├── .github/workflows/test.yml # push・PR時の自動テスト
 ├── package.json        # npm test（依存なし）
 ├── CLAUDE.md           # 開発ガイド
 ├── LICENSE             # MITライセンス
+├── README.en.md        # 英語版README
 └── README.md           # 使い方と検証可能な例
 ```
 

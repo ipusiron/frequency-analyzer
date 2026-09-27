@@ -36,11 +36,13 @@ test('英語頻度合計とICの既知値', () => {
 });
 
 test('IC分類の0.060・0.045境界と低信頼29/30字', () => {
-  assert.equal(L.classifyIC(0.060), '英語平文に近い（単一換字や転置の可能性）');
-  assert.equal(L.classifyIC(0.059999), '判定保留');
-  assert.equal(L.classifyIC(0.045), '判定保留');
-  assert.equal(L.classifyIC(0.044999), '均等分布に近い（多表式の可能性）');
-  assert.match(L.classifyIC(null), /算出不可/);
+  // 分類は文言ではなく辞書のキーを返す。しきい値は変えない。
+  assert.equal(L.classifyIC(0.060), 'ic.plainLike');
+  assert.equal(L.classifyIC(0.059999), 'ic.undecided');
+  assert.equal(L.classifyIC(0.045), 'ic.undecided');
+  assert.equal(L.classifyIC(0.044999), 'ic.flat');
+  assert.equal(L.classifyIC(null), 'ic.unavailable');
+  assert.equal(L.classifyIC(Number.NaN), 'ic.unavailable');
   assert.equal(L.isICReliable('A'.repeat(29)), false);
   assert.equal(L.isICReliable('A'.repeat(30)), true);
 });

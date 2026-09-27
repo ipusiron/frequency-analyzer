@@ -3,9 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.join(__dirname, '..');
-const files = ['index.html', 'main.js', 'freq-logic.js', 'style.css',
+const files = ['index.html', 'main.js', 'freq-logic.js', 'i18n.js', 'style.css',
   ...fs.readdirSync(__dirname).filter(n => n.endsWith('.test.js')).map(n => `test/${n}`)];
-const minimums = { 'index.html': 80, 'main.js': 200, 'freq-logic.js': 90, 'style.css': 300 };
+const minimums = { 'index.html': 80, 'main.js': 200, 'freq-logic.js': 90, 'i18n.js': 150, 'style.css': 300 };
 
 for (const file of files) {
   test(`${file}の複数行整形と行幅`, () => {

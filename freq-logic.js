@@ -33,11 +33,12 @@
     return rows.reduce((sum, row) => sum + row.count * (row.count - 1), 0) / (n * (n - 1));
   }
 
+  // 文言ではなく辞書のキーを返す。しきい値の0.060と0.045は変更しない。
   function classifyIC(ic) {
-    if (ic === null || !Number.isFinite(ic)) return '算出不可（英字2字未満）';
-    if (ic >= 0.060) return '英語平文に近い（単一換字や転置の可能性）';
-    if (ic >= 0.045) return '判定保留';
-    return '均等分布に近い（多表式の可能性）';
+    if (ic === null || !Number.isFinite(ic)) return 'ic.unavailable';
+    if (ic >= 0.060) return 'ic.plainLike';
+    if (ic >= 0.045) return 'ic.undecided';
+    return 'ic.flat';
   }
 
   function isICReliable(text) {
@@ -97,11 +98,12 @@
     return decoded;
   }
 
+  // 警告も文言ではなくキーで返す。表示の直前に訳す。
   function readTextParam(params) {
     const text = params.get('text'); // URLSearchParamsですでにデコードされている。
-    if (text === null) return { text: null, warning: '' };
-    if (text.length > 5000) return { text: null, warning: 'URLのテキストが5,000文字を超えるため読み込みませんでした。' };
-    return { text, warning: '' };
+    if (text === null) return { text: null, warningKey: '' };
+    if (text.length > 5000) return { text: null, warningKey: 'url.tooLong' };
+    return { text, warningKey: '' };
   }
 
   globalThis.FrequencyLogic = {

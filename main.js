@@ -7,6 +7,8 @@ let manualChars = new Set();
 let analysis = FrequencyLogic.analyzeText('');
 let highlightTimer;
 let copyTimer;
+// クリア直後は分析結果が無い。言語を変えても再分析しないための印である。
+let isCleared = false;
 
 function analyze() {
   const input = document.getElementById("cipherText").value;
@@ -18,6 +20,7 @@ function analyze() {
 
   // 手動調整は再分析しても保持する。
   analysis = FrequencyLogic.analyzeText(input);
+  isCleared = false;
 
   // 非英字文字が含まれているかチェック
   const hasNonAlpha = /[^A-Za-z]/.test(input);
@@ -28,36 +31,38 @@ function analyze() {
 
   // 小文字（平文）が含まれる場合のUI表示
   const hasLowercase = plainCharsOnly.length > 0;
+  const confirmed = document.getElementById("confirmedStats");
+  document.getElementById("caseProcessingMessage").hidden = !hasLowercase;
+  confirmed.hidden = !hasLowercase;
   if (hasLowercase) {
-    document.getElementById("caseProcessingMessage").hidden = false;
-    document.getElementById("confirmedStats").hidden = false;
-
-    // 統計情報の更新
+    // 統計情報の更新。語順が言語で変わるため、文全体をt()で組み立てる。
     const uniqueCipherChars = [...new Set(cipherCharsOnly)].sort();
     const uniquePlainChars = [...new Set(plainCharsOnly)].sort();
-    document.getElementById("cipherCharCount").textContent = uniqueCipherChars.length;
-    document.getElementById("cipherCharList").textContent = uniqueCipherChars.join('');
-    document.getElementById("plainCharCount").textContent = uniquePlainChars.length;
-    document.getElementById("plainCharList").textContent = uniquePlainChars.join('');
+    confirmed.textContent = I18n.t('stats.confirmed', {
+      cipherCount: uniqueCipherChars.length, cipherList: uniqueCipherChars.join(''),
+      plainCount: uniquePlainChars.length, plainList: uniquePlainChars.join('')
+    });
   } else {
-    document.getElementById("caseProcessingMessage").hidden = true;
-    document.getElementById("confirmedStats").hidden = true;
+    confirmed.textContent = '';
   }
 
   // 頻度カウント（大文字のみ対象）
   frequencyData = Object.fromEntries(analysis.rows.map(row => [row.char, row.count]));
   document.getElementById('charStats').hidden = false;
-  document.getElementById('analysisStats').textContent =
-    `英字${analysis.letterCount}字・異なり${analysis.uniqueCount}文字・語数${FrequencyLogic.wordsOf(input).length}`;
+  document.getElementById('analysisStats').textContent = I18n.t('stats.analysis', {
+    letters: analysis.letterCount, unique: analysis.uniqueCount, words: FrequencyLogic.wordsOf(input).length
+  });
   const ic = FrequencyLogic.indexOfCoincidence(input);
-  document.getElementById('icStats').textContent =
-    `IC ${ic === null ? '—' : ic.toFixed(4)}：${FrequencyLogic.classifyIC(ic)}`;
+  document.getElementById('icStats').textContent = I18n.t('stats.ic', {
+    value: ic === null ? '—' : ic.toFixed(4), verdict: I18n.t(FrequencyLogic.classifyIC(ic))
+  });
   document.getElementById('reliabilityNote').textContent = FrequencyLogic.isICReliable(input)
-    ? '' : '英字30字未満の短文のため信頼性が低い目安です。';
+    ? '' : I18n.t('stats.reliability');
 
   // 頻度表の表示
   const freqLines = analysis.rows.map(({ char, count, percent, expected, diff }) =>
-    `${char}: ${count}（${percent.toFixed(2)}%／英語 ${expected.toFixed(3)}%／差 ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}）`);
+    I18n.t('freq.row', { char, count, percent: percent.toFixed(2),
+      expected: expected.toFixed(3), diff: `${diff >= 0 ? '+' : ''}${diff.toFixed(2)}` }));
 
   const frequencyResults = document.getElementById("frequencyResults");
   frequencyResults.replaceChildren();
@@ -67,7 +72,7 @@ function analyze() {
     div.textContent = line;
     frequencyResults.appendChild(div);
   });
-  if (!analysis.letterCount) frequencyResults.textContent = '英字（A-Z）が含まれていません';
+  if (!analysis.letterCount) frequencyResults.textContent = I18n.t('freq.none');
   displayNgrams(input);
 
   // システム推測の生成
@@ -135,7 +140,7 @@ function createMappingTable() {
     input.id = `map_${char}`;
     input.maxLength = 1;
     input.value = currentMapping[char] || '';
-    input.setAttribute('aria-label', `暗号文文字${char}に対応する平文文字`);
+    input.setAttribute('aria-label', I18n.t('mapping.inputAria', { char }));
     row.children[3].appendChild(input);
     table.appendChild(row);
 
@@ -167,7 +172,8 @@ function createMappingTable() {
 
 function getCandidates(cipherChar) {
   const candidates = FrequencyLogic.candidatesFor(cipherChar, currentMapping, confirmedPlainChars);
-  return candidates.text + (candidates.remaining ? `（ほか${candidates.remaining}字）` : '');
+  return candidates.text
+    + (candidates.remaining ? I18n.t('mapping.moreCandidates', { count: candidates.remaining }) : '');
 }
 
 function updateCandidates() {
@@ -215,7 +221,15 @@ function checkDuplicates() {
   });
   const message = document.getElementById('duplicateMessage');
   message.hidden = !duplicates.size;
-  message.textContent = duplicates.size ? `重複している平文文字: ${[...duplicates].sort().join(', ')}` : '';
+  // 文言ではなく重複した文字そのものを覚え、言語の切り替えで訳し直す。
+  message.dataset.letters = duplicates.size ? [...duplicates].sort().join(', ') : '';
+  renderDuplicateMessage();
+}
+
+function renderDuplicateMessage() {
+  const message = document.getElementById('duplicateMessage');
+  const letters = message.dataset.letters || '';
+  message.textContent = letters ? I18n.t('mapping.duplicate', { letters }) : '';
 }
 
 function decodeText() {
@@ -258,7 +272,7 @@ function drawFrequencyChart() {
   svg.dataset.yMax = String(maxPercent);
   if (!analysis.letterCount) return;
   const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-  title.textContent = '観測％の棒と英語期待％のマーカー';
+  title.textContent = I18n.t('chart.svgTitle');
   svg.appendChild(title);
 
   const chartWidth = 380;
@@ -308,7 +322,8 @@ function drawFrequencyChart() {
     bar.setAttribute('width', barWidth - 4);
     bar.setAttribute('height', barHeight);
     const barTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-    barTitle.textContent = `${char}: ${count}回、観測${percent.toFixed(2)}%／英語${FrequencyLogic.ENGLISH_FREQ[char]}%`;
+    barTitle.textContent = I18n.t('chart.barTitle', { char, count,
+      percent: percent.toFixed(2), expected: FrequencyLogic.ENGLISH_FREQ[char] });
     bar.appendChild(barTitle);
     svg.appendChild(bar);
     const expectedY = chartHeight - FrequencyLogic.ENGLISH_FREQ[char] / maxPercent * (chartHeight - 20);
@@ -355,8 +370,8 @@ function displayNgrams(input) {
   ]) {
     const visible = all ? rows : rows.filter(row => row.count >= 2).slice(0, 10);
     document.getElementById(id).textContent = visible.length
-      ? visible.map(row => `${row.text} ${row.count}`).join('／')
-      : all ? '連続同一文字はありません' : '2回以上出現するものはありません';
+      ? visible.map(row => `${row.text} ${row.count}`).join(I18n.t('list.separator'))
+      : I18n.t(all ? 'double.none' : 'ngram.none');
   }
 }
 
@@ -371,35 +386,44 @@ function clearMapping() {
   decodeText();
 }
 
+// コピーの状態はdatasetに持たせ、言語の切り替えで文言だけを訳し直す。
+function renderCopyFeedback() {
+  const button = document.getElementById('copyBtn');
+  const message = document.getElementById('copyMessage');
+  const state = button.dataset.copyState || '';
+  button.textContent = I18n.t(state === 'done' ? 'button.copyDone' : 'button.copy');
+  button.classList.toggle('copy-success', state === 'done');
+  button.classList.toggle('copy-error', state === 'error');
+  message.textContent = message.dataset.messageKey ? I18n.t(message.dataset.messageKey) : '';
+}
+
 async function copyResult() {
   const resultText = document.getElementById("decodedText").value;
   const button = document.getElementById('copyBtn');
   const message = document.getElementById('copyMessage');
   clearTimeout(copyTimer);
-  button.classList.remove('copy-success', 'copy-error');
   try {
     if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('clipboard unavailable');
     await navigator.clipboard.writeText(resultText);
     // 一時的にボタンのテキストを変更してフィードバック
-    button.textContent = "✅ コピー完了!";
-    button.classList.add('copy-success');
-    message.textContent = '解読結果をコピーしました。';
+    button.dataset.copyState = 'done';
+    message.dataset.messageKey = 'copy.success';
   } catch {
     document.getElementById('decodedText').focus();
     document.getElementById('decodedText').select();
-    button.classList.add('copy-error');
-    message.textContent = '自動コピーが使えません。選択された解読結果を手動でコピーしてください。';
+    button.dataset.copyState = 'error';
+    message.dataset.messageKey = 'copy.failure';
   }
+  renderCopyFeedback();
   copyTimer = setTimeout(() => {
-    button.textContent = '📋 コピー';
-    button.classList.remove('copy-success', 'copy-error');
+    button.dataset.copyState = '';
+    renderCopyFeedback();
   }, 1000);
 }
 
 function clearResult() {
   document.getElementById("cipherText").value = '';
   document.getElementById("decodedText").value = '';
-  document.getElementById("decodedText").placeholder = 'マッピングを設定すると解読結果が表示されます';
   frequencyData = {};
   currentMapping = {};
   systemGuess = {};
@@ -407,12 +431,15 @@ function clearResult() {
   confirmedPlainChars = new Set();
   manualChars.clear();
   analysis = FrequencyLogic.analyzeText('');
+  isCleared = true;
   clearTimeout(highlightTimer);
   clearTimeout(copyTimer);
   document.getElementById('decodedText').classList.remove('is-highlighted');
-  document.getElementById('copyBtn').classList.remove('copy-success', 'copy-error');
-  document.getElementById('copyBtn').textContent = '📋 コピー';
-  document.getElementById('copyMessage').textContent = '';
+  document.getElementById('copyBtn').dataset.copyState = '';
+  document.getElementById('copyMessage').dataset.messageKey = '';
+  document.getElementById('confirmedStats').textContent = '';
+  document.getElementById('duplicateMessage').dataset.letters = '';
+  renderCopyFeedback();
 
   // 警告メッセージを非表示
   document.getElementById("nonAlphaWarning").hidden = true;
@@ -428,20 +455,31 @@ function clearResult() {
   }
 }
 
+function renderUrlWarning() {
+  const warning = document.getElementById('urlWarning');
+  const key = warning.dataset.messageKey || '';
+  warning.hidden = !key;
+  warning.textContent = key ? I18n.t(key) : '';
+}
+
 function loadTextFromURL() {
   const result = FrequencyLogic.readTextParam(new URLSearchParams(window.location.search));
-  const warning = document.getElementById('urlWarning');
-  warning.hidden = !result.warning;
-  warning.textContent = result.warning;
+  // 文言ではなくキーを覚える。言語の切り替えで訳し直せるようにするためである。
+  document.getElementById('urlWarning').dataset.messageKey = result.warningKey;
+  renderUrlWarning();
   if (result.text === null) return false;
   document.getElementById('cipherText').value = result.text;
   return true;
 }
 
 function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  document.getElementById('themeToggleBtn').setAttribute('aria-pressed', String(theme === 'dark'));
-  document.getElementById('themeToggleBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const isDark = theme === 'dark';
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  const button = document.getElementById('themeToggleBtn');
+  button.setAttribute('aria-pressed', String(isDark));
+  button.textContent = isDark ? '☀️' : '🌙';
+  // 状態で変わる属性はapply()に任せず、毎回ここで組み立てる。
+  button.setAttribute('aria-label', I18n.t(isDark ? 'theme.toLight' : 'theme.toDark'));
 }
 
 function initializeTheme() {
@@ -475,8 +513,24 @@ function initializeHelp() {
   document.addEventListener('keydown', event => { if (event.key === 'Escape') setOpen(false); });
 }
 
+function initializeLanguage() {
+  I18n.init();
+  document.getElementById('langToggle').addEventListener('click', () =>
+    I18n.setLanguage(I18n.language === 'ja' ? 'en' : 'ja'));
+  document.addEventListener('languagechange', () => {
+    // apply()のあとに走るので、状態で決まる文言はここで書き戻す。
+    applyTheme(document.documentElement.dataset.theme);
+    renderUrlWarning();
+    renderCopyFeedback();
+    renderDuplicateMessage();
+    // クリア直後は分析結果が無い。再分析すると空の統計を出してしまう。
+    if (!isCleared) analyze();
+  });
+}
+
 // 初期化
 document.addEventListener('DOMContentLoaded', function() {
+  initializeLanguage();
   initializeTheme();
   initializeHelp();
   // URLパラメータからテキストを読み込み、なければデフォルトのまま
