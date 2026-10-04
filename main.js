@@ -463,7 +463,16 @@ function renderUrlWarning() {
 }
 
 function loadTextFromURL() {
-  const result = FrequencyLogic.readTextParam(new URLSearchParams(window.location.search));
+  const result = FrequencyLogic.readTextParam(FrequencyLogic.linkParams(window.location.search, window.location.hash));
+  // 読み込んだらURLからtextを消す（replaceStateなので「戻る」の回数は増えない）。
+  const cleaned = FrequencyLogic.urlWithoutText(window.location.href);
+  if (cleaned !== null) {
+    try {
+      history.replaceState(history.state, '', cleaned);
+    } catch {
+      // file://などで消せなくても、読み込みは続ける。
+    }
+  }
   // 文言ではなくキーを覚える。言語の切り替えで訳し直せるようにするためである。
   document.getElementById('urlWarning').dataset.messageKey = result.warningKey;
   renderUrlWarning();

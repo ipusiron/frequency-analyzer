@@ -33,7 +33,7 @@
   - `classifyIC`と`readTextParam`は文言ではなく辞書のキー（`ic.*`・`url.*`）を返す。
 - 語内の集計：`wordsOf`、`ngramCounts`、`doubledLetters`
 - マッピング：`systemGuess`、`candidatesFor`、`mergeMapping`、`decodeWithMapping`
-- URLパラメーター：`readTextParam`（URLSearchParamsを受け取る）
+- URLパラメーター：`readTextParam`（URLSearchParamsを受け取る）、`linkParams`（`#`を優先）、`urlWithoutText`
 
 DOMを参照せず、古典スクリプトの`globalThis.FrequencyLogic`とCommonJSから使えます。
 ES moduleにはしません。
@@ -110,7 +110,8 @@ ICの30字境界は低信頼を示す目安です。システム推測のETAOIN�
 
 URLパラメーターから暗号文を読み込めます。
 
-- パラメーター：`?text=<URL-encoded-text>`
+- パラメーター：`#text=<URL-encoded-text>`（優先。サーバーへ送られず、URLの長さの上限もない）または`?text=<URL-encoded-text>`（`linkParams`）
+- 読み込んだら`urlWithoutText`で`#`と`?`の両方から`text`を消す（`history.replaceState`）
 - 上限：5,000文字
 - `URLSearchParams.get`の値をそのまま使い、二重デコードしない。超過は画面に警告する。
 - 例：`index.html?text=LW%20LV%20LPSRVVLEOH`

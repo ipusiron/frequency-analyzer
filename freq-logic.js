@@ -106,9 +106,29 @@
     return { text, warningKey: '' };
   }
 
+  // 受け渡しの文字列は「#」より後ろ（サーバーへ送られず、URLの長さの上限もない）を優先し、なければ「?」から読む。
+  function linkParams(search, hash) {
+    const fromHash = new URLSearchParams(String(hash || '').replace(/^#/, ''));
+    return fromHash.has('text') ? fromHash : new URLSearchParams(search || '');
+  }
+
+  // 読み込んだtextを「?」と「#」の両方から消したときのパス。textがなければnull。
+  // アドレスバー・ブックマーク・URLのコピーに暗号文を残さないため。
+  function urlWithoutText(href) {
+    const url = new URL(href);
+    const fromHash = new URLSearchParams(url.hash.slice(1));
+    const inHash = fromHash.has('text');
+    if (!url.searchParams.has('text') && !inHash) return null;
+    url.searchParams.delete('text');
+    fromHash.delete('text');
+    const hash = inHash ? fromHash.toString() : url.hash.slice(1);
+    return url.pathname + url.search + (hash ? `#${hash}` : '');
+  }
+
   globalThis.FrequencyLogic = {
     ENGLISH_FREQ, ETAOIN_ORDER, analyzeText, indexOfCoincidence, classifyIC, isICReliable,
-    ngramCounts, doubledLetters, wordsOf, systemGuess, candidatesFor, decodeWithMapping, mergeMapping, readTextParam
+    ngramCounts, doubledLetters, wordsOf, systemGuess, candidatesFor, decodeWithMapping, mergeMapping, readTextParam,
+    linkParams, urlWithoutText
   };
   if (typeof module === 'object' && module.exports) module.exports = FrequencyLogic;
 })();
