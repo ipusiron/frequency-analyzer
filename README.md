@@ -136,9 +136,10 @@ GETパラメーターを使用して、URL経由で暗号文を自動的に読�
 
 #### URLの指定方法
 
-URLに`?text=`パラメーターを付けて、URLエンコードした暗号文を渡します。
+URLに`#text=`（推奨）または`?text=`を付けて、URLエンコードした暗号文を渡します。`#`より後ろはサーバーへ送られないので、暗号文がGitHub Pagesに届かず、URLの長さの上限（GitHub Pagesはパスと`?`以降で8,192バイトまで）も受けません。
 
 ```
+https://ipusiron.github.io/frequency-analyzer/#text=LW%20LV%20LPSRVVLEOH
 https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 ```
 
@@ -148,6 +149,8 @@ https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 - **形式**: URLエンコードされた文字列
 - **文字数制限**: 5,000文字まで
 - **動作**: ページ読み込み時に入力欄にセットし、頻度分析を実行する。
+- **場所**: `#`より後ろを優先し、なければ`?`より後ろから読む。
+- **読み込んだあと**: URLの`#`と`?`の両方から`text`を消す（アドレスバー・ブックマーク・URLのコピーに残さない）。開いたときのURLは、ブラウザーの閲覧履歴に残ることがある。
 
 `URLSearchParams`による1回のデコードだけを使います。
 `?text=100%25`は`100%`、`?text=%2541BC`は`%41BC`として扱い、二重デコードしません。

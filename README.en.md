@@ -102,9 +102,10 @@ A GET parameter loads a ciphertext when the page opens.
 
 #### How to build the URL
 
-Append `?text=` and a URL-encoded ciphertext.
+Append `#text=` (recommended) or `?text=` and a URL-encoded ciphertext. The part after `#` is not sent to the server, so the ciphertext does not reach GitHub Pages and is not subject to the URL length limit (GitHub Pages accepts up to 8,192 bytes for the path and the part after `?`).
 
 ```
+https://ipusiron.github.io/frequency-analyzer/#text=LW%20LV%20LPSRVVLEOH
 https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 ```
 
@@ -114,6 +115,8 @@ https://ipusiron.github.io/frequency-analyzer/?text=LW%20LV%20LPSRVVLEOH
 - **Format**: a URL-encoded string
 - **Limit**: 5,000 characters
 - **Behavior**: the value fills the input box on load, and the analysis runs at once.
+- **Where**: the part after `#` is read first; otherwise the part after `?`.
+- **After reading**: `text` is removed from both `#` and `?` in the URL (so it does not stay in the address bar, bookmarks or copied URLs). The URL as opened may remain in the browser history.
 
 The value is decoded exactly once, by `URLSearchParams`.
 So `?text=100%25` gives `100%` and `?text=%2541BC` gives `%41BC`; there is no second decoding pass.
