@@ -142,6 +142,12 @@ A duplicated plaintext letter is reported by the message list and by `aria-inval
 
 ## 🎯 Use cases
 
+### Ways of using this tool in particular
+
+- Telling romanized Japanese from English (language and cryptography classes, Japanese puzzles): the Iroha poem in romaji (91 letters) has 47 vowels, or 51.6%, while the opening of the Gettysburg Address (143 letters) has 40.6% (38.1% in the standard English frequency table). The index of coincidence (IC), on the other hand, is 0.066 for the Iroha poem and 0.068 for the address, and both are judged "plaintext-like". IC alone cannot tell the languages apart, but the share of vowels can
+- Comparing keyboard layouts by letter frequency: counted with the standard English frequency table, letters typed on the top row of a QWERTY keyboard make up 51.3%, the home row 34.0% and the bottom row 14.6%. It gives numbers for discussing layout design, that is, which row the common letters should go on
+- Planning the first move in a word game: use the order of English letter frequency (E, T, A, O, I, N, S, H, R, ...) when choosing the first word in a word-guessing game such as Wordle (the frequencies of running text and of five-letter words are not the same, so treat it as a guide)
+
 ### 🧠 As an aid to cryptanalysis
 
 Frequency analysis helps against ciphers such as these.
