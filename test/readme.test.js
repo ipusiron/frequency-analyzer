@@ -100,3 +100,32 @@ test('YAML構造・固定値・シリーズ・MITを保持', () => {
   assert.ok(license.startsWith('MIT License\n') || license.startsWith('MIT License\r\n'));
   assert.ok(license.includes('Copyright (c) 2025 ipusiron'));
 });
+
+test('ユースケースの「このツールならではの使い方」の数値は計算部と同じ（日英）', () => {
+  const readmeEn = fs.readFileSync(path.join(root, 'README.en.md'), 'utf8');
+  const vowelShare = (t) => {
+    const r = L.analyzeText(t);
+    const v = r.rows.filter((x) => 'AEIOU'.includes(x.char)).reduce((a, x) => a + x.count, 0);
+    return [r.letterCount, v, (v / r.letterCount * 100).toFixed(1), L.indexOfCoincidence(t).toFixed(3)];
+  };
+  const iroha = 'IROHANIHOHETO CHIRINURUWO WAKAYOTAREZO TSUNENARAMU UINOOKUYAMA KEFUKOETE ASAKIYUMEMISHI WEHIMOSEZU';
+  const g = 'FOUR SCORE AND SEVEN YEARS AGO OUR FATHERS BROUGHT FORTH ON THIS CONTINENT A NEW NATION CONCEIVED '
+    + 'IN LIBERTY AND DEDICATED TO THE PROPOSITION THAT ALL MEN ARE CREATED EQUAL';
+  const [a, b] = [vowelShare(iroha), vowelShare(g)];
+  assert.deepEqual(a, [91, 47, '51.6', '0.066']);
+  assert.deepEqual(b, [143, 58, '40.6', '0.068']);
+  for (const t of [iroha, g]) assert.equal(L.classifyIC(L.indexOfCoincidence(t)), 'ic.plainLike');
+  const F = L.ENGLISH_FREQ;
+  const share = (s) => [...s].reduce((x, c) => x + F[c], 0).toFixed(1);
+  const [vow, top, home, bottom] = [share('AEIOU'), share('QWERTYUIOP'), share('ASDFGHJKL'), share('ZXCVBNM')];
+  assert.deepEqual([vow, top, home, bottom], ['38.1', '51.3', '34.0', '14.6']);
+  const ja = [`英字${a[0]}字）は母音が${a[1]}字で${a[2]}%`, `英字${b[0]}字）は${b[2]}%`, `標準の頻度表では${vow}%`,
+    `いろは歌が${a[3]}、演説が${b[3]}`, `上の段で打つ字が${top}%、ホーム段が${home}%、下の段が${bottom}%`];
+  for (const part of ja) assert.ok(readme.includes(part), part);
+  const en = [`(${a[0]} letters) has ${a[1]} vowels, or ${a[2]}%`, `(${b[0]} letters) has ${b[2]}%`,
+    `${vow}% in the standard English`, `${a[3]} for the Iroha poem and ${b[3]} for the address`,
+    `top row of a QWERTY keyboard make up ${top}%, the home row ${home}% and the bottom row ${bottom}%`];
+  for (const part of en) assert.ok(readmeEn.includes(part), part);
+  assert.ok(L.ETAOIN_ORDER.startsWith('ETAOINSHR'));
+  assert.ok(readme.includes('E・T・A・O・I・N・S・H・R') && readmeEn.includes('E, T, A, O, I, N, S, H, R'));
+});
