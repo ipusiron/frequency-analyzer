@@ -467,12 +467,13 @@ ETAOINは出現順位を対応付けるだけです。短文や文章の内容�
 ```text
 frequency-analyzer/
 ├── index.html          # 入力・統計・グラフ・マッピング画面
+├── theme-init.js       # 最初の描画の前にテーマを決める（<head>で読み込む）
 ├── i18n.js             # 日本語・英語の辞書と切り替え
 ├── freq-logic.js       # DOMに触れない解析・復号ロジック
 ├── main.js             # DOMの更新とイベント処理
 ├── style.css           # レスポンシブ表示と両テーマの配色
 ├── assets/             # スクリーンショット4枚と既存スライド画像
-├── test/               # node:testによる7つのテストファイル（test/i18n.test.jsを含む）
+├── test/               # node:testによる8つのテストファイル（test/i18n.test.jsを含む）
 ├── .github/workflows/test.yml # push・PR時の自動テスト
 ├── package.json        # npm test（依存なし）
 ├── CLAUDE.md           # 開発ガイド

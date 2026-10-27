@@ -492,11 +492,8 @@ function applyTheme(theme) {
 }
 
 function initializeTheme() {
-  let saved = null;
-  try { saved = localStorage.getItem('theme'); } catch { /* 保存不可でも画面は動かす。 */ }
-  const initial = saved === null ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : saved === 'dark' ? 'dark' : 'light';
-  applyTheme(initial);
+  // 初回のテーマは<head>のtheme-init.jsが最初の描画の前に決める。ここではボタンを合わせるだけ。
+  applyTheme(document.documentElement.dataset.theme);
   document.getElementById('themeToggleBtn').addEventListener('click', () => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     applyTheme(theme);
