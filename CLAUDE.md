@@ -58,8 +58,9 @@ ES moduleにはしません。
 
 **その他のファイル**
 
+- `theme-init.js`：`<head>`で同期読み込みし、最初の描画の前に`data-theme`を決める
 - `style.css`：ライト・ダークのCSS変数、768px以下の1カラム表示
-- `test/`：freq-logic・urlparam・readme・html・contrast・format・i18nの7ファイル
+- `test/`：freq-logic・urlparam・readme・html・contrast・format・i18n・theme-initの8ファイル
 - `.github/workflows/test.yml`：pushとpull_requestでNode 22のテスト
 - `package.json`：npm testコマンド
 - `assets/`：画像4枚と既存のDocswellサムネイル

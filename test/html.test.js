@@ -18,7 +18,7 @@ test('CSPとmeta、インライン禁止、classic deferの順序', () => {
   assert.match(html, /<link rel="icon" href="data:,"/);
   assert.doesNotMatch(html, /\s(?:on\w+|style)\s*=/i);
   const scripts = [...html.matchAll(/<script\b[^>]*>/g)].map(m => m[0]);
-  assert.deepEqual(scripts, ['<script src="i18n.js" defer>',
+  assert.deepEqual(scripts, ['<script src="theme-init.js">', '<script src="i18n.js" defer>',
     '<script src="freq-logic.js" defer>', '<script src="main.js" defer>']);
   assert.doesNotMatch(html, /type="module"/);
   assert.doesNotMatch(read('main.js'), /innerHTML|alert\(|decodeURIComponent|\.style\.|\bfetch\(|XMLHttpRequest/);

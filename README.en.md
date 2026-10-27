@@ -403,12 +403,13 @@ guess. Clear empties the input and every panel.
 ```text
 frequency-analyzer/
 ├── index.html          # input, statistics, chart and mapping
+├── theme-init.js       # sets the theme before the first paint (loaded in <head>)
 ├── i18n.js             # Japanese and English dictionaries, and the switch
 ├── freq-logic.js       # analysis and decryption, with no DOM access
 ├── main.js             # DOM updates and event handling
 ├── style.css           # responsive layout and both themes
 ├── assets/             # four screenshots and an existing slide image
-├── test/               # seven node:test files, including test/i18n.test.js
+├── test/               # eight node:test files, including test/i18n.test.js
 ├── .github/workflows/test.yml # tests on push and pull request
 ├── package.json        # npm test (no dependencies)
 ├── CLAUDE.md           # development guide
